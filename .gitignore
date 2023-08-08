@@ -1,0 +1,8 @@
+*env
+*.flake8
+*.vscode
+.DS_Store
+output.txt
+*.calltree
+profile_results.prof
+project/cache/*
