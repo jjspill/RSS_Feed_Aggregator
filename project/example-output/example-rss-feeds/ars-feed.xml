@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Latest Updates</title>
+  <id>http://feeds.arstechnica.com/arstechnica/index/</id>
+  <updated>2023-08-10T14:54:33Z</updated>
+  <entry>
+    <title>Using AI to find antibodies is fast and produces unimagined molecules</title>
+    <published>2023-08-10T13:49:58+00:00</published>
+    <updated>2023-08-10T13:49:58+00:00</updated>
+    <id>https://arstechnica.com/?p=1960034</id>
+    <summary type="html">Automation means drug discovery process is less &quot;artisinal&quot; and more streamlined.</summary>
+    <category term="Biz &amp; IT"/>
+    <category term="Health"/>
+    <category term="Science"/>
+    <category term="AI"/>
+    <category term="drug develompment"/>
+    <category term="syndication"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1960034"/>
+    <author>
+      <name>WIRED</name>
+    </author>
+  </entry>
+  <entry>
+    <title>It’s finally time—Virgin Galactic is flying private astronauts into space</title>
+    <published>2023-08-10T03:17:09+00:00</published>
+    <updated>2023-08-10T03:17:09+00:00</updated>
+    <id>https://arstechnica.com/?p=1959695</id>
+    <summary type="html">It must be a magical moment to float freely above the world.</summary>
+    <category term="Science"/>
+    <category term="Space"/>
+    <category term="space"/>
+    <category term="Virgin Galactic"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959695"/>
+    <author>
+      <name>Eric Berger</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Juno is bringing Jupiter’s moon Io into sharper focus</title>
+    <published>2023-08-09T22:16:38+00:00</published>
+    <updated>2023-08-09T22:16:38+00:00</updated>
+    <id>https://arstechnica.com/?p=1959995</id>
+    <summary type="html">NASA's Juno probe wasn't designed for this.</summary>
+    <category term="Space"/>
+    <category term="Uncategorized"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959995"/>
+    <author>
+      <name>Stephen Clark</name>
+    </author>
+  </entry>
+  <entry>
+    <title>How an unpatched Microsoft Exchange 0-day likely caused one of the UK’s biggest hacks ever</title>
+    <published>2023-08-09T21:58:04+00:00</published>
+    <updated>2023-08-09T21:58:04+00:00</updated>
+    <id>https://arstechnica.com/?p=1959987</id>
+    <summary type="html">Evidence appears to show a critical 0-day tracked as ProxyNotShell was exploited.</summary>
+    <category term="Biz &amp; IT"/>
+    <category term="Security"/>
+    <category term="Exchange Server"/>
+    <category term="microsoft"/>
+    <category term="zeroday"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959987"/>
+    <author>
+      <name>Dan Goodin</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Twitter held in contempt, fined $350K over Trump data delay</title>
+    <published>2023-08-09T21:17:56+00:00</published>
+    <updated>2023-08-09T21:17:56+00:00</updated>
+    <id>https://arstechnica.com/?p=1959973</id>
+    <summary type="html">Trump accused the DOJ of &quot;secretly attacking&quot; his Twitter account.</summary>
+    <category term="Policy"/>
+    <category term="2020 election"/>
+    <category term="department of justice"/>
+    <category term="Donald Trump"/>
+    <category term="Elon Musk"/>
+    <category term="January 6"/>
+    <category term="Joe Biden"/>
+    <category term="sanctions"/>
+    <category term="truth social"/>
+    <category term="Twitter"/>
+    <category term="X"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959973"/>
+    <author>
+      <name>Ashley Belanger</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Supreme Court denies Epic’s request to open up App Store payments during appeals</title>
+    <published>2023-08-09T20:13:37+00:00</published>
+    <updated>2023-08-09T20:13:37+00:00</updated>
+    <id>https://arstechnica.com/?p=1959938</id>
+    <summary type="html">Apple's Supreme Court petition will decide if it can hold onto all app payments.</summary>
+    <category term="Gaming"/>
+    <category term="Tech"/>
+    <category term="9th circuit"/>
+    <category term="App Store"/>
+    <category term="apple"/>
+    <category term="Apple v Epic"/>
+    <category term="Epic Games"/>
+    <category term="fortnite"/>
+    <category term="Supreme Court"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959938"/>
+    <author>
+      <name>Kevin Purdy</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Mars rover finds signs of seasonal floods</title>
+    <published>2023-08-09T19:34:03+00:00</published>
+    <updated>2023-08-09T19:34:03+00:00</updated>
+    <id>https://arstechnica.com/?p=1959934</id>
+    <summary type="html">It's an exciting find because wet/dry cycles may be central to pre-life chemistry.</summary>
+    <category term="Science"/>
+    <category term="Mars"/>
+    <category term="NASA"/>
+    <category term="origin of life"/>
+    <category term="planetary science"/>
+    <category term="rovers"/>
+    <category term="water"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959934"/>
+    <author>
+      <name>John Timmer</name>
+    </author>
+  </entry>
+  <entry>
+    <title>“Downfall” bug affects years of Intel CPUs, can leak encryption keys and more</title>
+    <published>2023-08-09T19:12:26+00:00</published>
+    <updated>2023-08-09T19:12:26+00:00</updated>
+    <id>https://arstechnica.com/?p=1959890</id>
+    <summary type="html">Researchers also disclosed a separate bug called &quot;Inception&quot; for newer AMD CPUs.</summary>
+    <category term="Biz &amp; IT"/>
+    <category term="Security"/>
+    <category term="Tech"/>
+    <category term="amd epyc"/>
+    <category term="AMD Ryzen"/>
+    <category term="amd threadripper"/>
+    <category term="Intel"/>
+    <category term="intel core"/>
+    <category term="intel cpus"/>
+    <category term="Intel Xeon"/>
+    <category term="security"/>
+    <category term="server CPUs"/>
+    <category term="vulnerability"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959890"/>
+    <author>
+      <name>Andrew Cunningham</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Hydrogen-powered planes almost ready for takeoff</title>
+    <published>2023-08-09T19:04:33+00:00</published>
+    <updated>2023-08-09T19:04:33+00:00</updated>
+    <id>https://arstechnica.com/?p=1959634</id>
+    <summary type="html">Companies are readying hardware but differ dramatically in how they're testing it.</summary>
+    <category term="Science"/>
+    <category term="aircraft"/>
+    <category term="aviation"/>
+    <category term="green"/>
+    <category term="hydrogen"/>
+    <category term="renewable energy"/>
+    <category term="sustainability"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959634"/>
+    <author>
+      <name>Ars Contributors</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Amazon won’t stop sending tortured woman unwanted boxes of shoes</title>
+    <published>2023-08-09T18:33:38+00:00</published>
+    <updated>2023-08-09T18:33:38+00:00</updated>
+    <id>https://arstechnica.com/?p=1959917</id>
+    <summary type="html">Fifty unwanted Amazon packages arrived in two months, mostly containing shoes.</summary>
+    <category term="Policy"/>
+    <category term="Uncategorized"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959917"/>
+    <author>
+      <name>Ashley Belanger</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Getting AAA games working in Linux sometimes requires concealing your GPU</title>
+    <published>2023-08-09T17:57:09+00:00</published>
+    <updated>2023-08-09T17:57:09+00:00</updated>
+    <id>https://arstechnica.com/?p=1959896</id>
+    <summary type="html">&lt;em&gt;Hogwarts Legacy&lt;/em&gt; must be conned to avoid crashing itself with XeSS upscaling.</summary>
+    <category term="Gaming"/>
+    <category term="GPUs"/>
+    <category term="Intel"/>
+    <category term="Intel Arc"/>
+    <category term="Linux"/>
+    <category term="Linux Gaming"/>
+    <category term="proton"/>
+    <category term="xess"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959896"/>
+    <author>
+      <name>Kevin Purdy</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Cadillac reveals the 2025 Escalade IQ, one excessive EV</title>
+    <published>2023-08-09T16:00:05+00:00</published>
+    <updated>2023-08-09T16:00:05+00:00</updated>
+    <id>https://arstechnica.com/?p=1959843</id>
+    <summary type="html">450 miles of range, 24-inch wheels, and a price tag starting around $130,000.</summary>
+    <category term="Cars"/>
+    <category term="Cadillac Escalade"/>
+    <category term="Cadillac Escalade IQ"/>
+    <category term="Cadillac EV SUV"/>
+    <category term="electric escalade"/>
+    <category term="Escalade"/>
+    <category term="Escalade EV"/>
+    <category term="General Motors"/>
+    <category term="Ultium"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959843"/>
+    <author>
+      <name>Jonathan M. Gitlin</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Next-gen OSDP was supposed to make it harder to break in to secure facilities. It failed.</title>
+    <published>2023-08-09T14:30:07+00:00</published>
+    <updated>2023-08-09T14:30:07+00:00</updated>
+    <id>https://arstechnica.com/?p=1959810</id>
+    <summary type="html">OSDP Secure Channel has yet to gain widespread usage, and it's already broken.</summary>
+    <category term="Biz &amp; IT"/>
+    <category term="Features"/>
+    <category term="Security"/>
+    <category term="open supervised device protocol"/>
+    <category term="osdp"/>
+    <category term="PACs"/>
+    <category term="physical access control systems"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959810"/>
+    <author>
+      <name>Dan Goodin</name>
+    </author>
+  </entry>
+  <entry>
+    <title>The race to save Florida’s coral reef from hot ocean waters</title>
+    <published>2023-08-09T13:57:21+00:00</published>
+    <updated>2023-08-09T13:57:21+00:00</updated>
+    <id>https://arstechnica.com/?p=1959857</id>
+    <summary type="html">Coral reef nurseries are being moved to deeper waters—or back into giant tanks on land.</summary>
+    <category term="Science"/>
+    <category term="climate change"/>
+    <category term="coral bleaching"/>
+    <category term="Florida Keys"/>
+    <category term="ocean warming"/>
+    <category term="syndication"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959857"/>
+    <author>
+      <name>The Conversation</name>
+    </author>
+  </entry>
+  <entry>
+    <title>How we host Ars, the finale and the 64-bit future</title>
+    <published>2023-08-09T13:00:21+00:00</published>
+    <updated>2023-08-09T13:00:21+00:00</updated>
+    <id>https://arstechnica.com/?p=1957664</id>
+    <summary type="html">We wrap up our four-part series by tying up loose ends and looking ahead.</summary>
+    <category term="Biz &amp; IT"/>
+    <category term="Features"/>
+    <category term="Amazon Web Services"/>
+    <category term="AWS"/>
+    <category term="containerization"/>
+    <category term="containers"/>
+    <category term="ECS"/>
+    <category term="farget"/>
+    <category term="feature report"/>
+    <category term="featurereport"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1957664"/>
+    <author>
+      <name>Lee Hutchinson</name>
+    </author>
+  </entry>
+  <entry>
+    <title>NASA’s Artemis II crew meets their Moonship</title>
+    <published>2023-08-09T00:25:09+00:00</published>
+    <updated>2023-08-09T00:25:09+00:00</updated>
+    <id>https://arstechnica.com/?p=1959800</id>
+    <summary type="html">NASA's Orion spacecraft is taking a bit longer to prepare for its first crew flight.</summary>
+    <category term="Space"/>
+    <category term="artemis"/>
+    <category term="artemis II"/>
+    <category term="human spaceflight"/>
+    <category term="Kennedy Space Center"/>
+    <category term="moon"/>
+    <category term="NASA"/>
+    <category term="orion"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959800"/>
+    <author>
+      <name>Stephen Clark</name>
+    </author>
+  </entry>
+  <entry>
+    <title>New LG TVs relegate I/O to a box you can set 30 feet from the screen</title>
+    <published>2023-08-08T21:33:45+00:00</published>
+    <updated>2023-08-08T21:33:45+00:00</updated>
+    <id>https://arstechnica.com/?p=1959663</id>
+    <summary type="html">Wireless-ish—but TV and port box still need power cords.</summary>
+    <category term="Tech"/>
+    <category term="Ars Shopping"/>
+    <category term="LG"/>
+    <category term="oled"/>
+    <category term="TVs"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959663"/>
+    <author>
+      <name>Scharon Harding</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Florida man gets unexplained leprosy case; doctors suspect local soil</title>
+    <published>2023-08-08T21:29:24+00:00</published>
+    <updated>2023-08-08T21:29:24+00:00</updated>
+    <id>https://arstechnica.com/?p=1959775</id>
+    <summary type="html">Leprosy is not very contagious, and the CDC has not issued a travel advisory.</summary>
+    <category term="Health"/>
+    <category term="bacteria"/>
+    <category term="CDC"/>
+    <category term="emerging infectious disease"/>
+    <category term="Florida"/>
+    <category term="Infectious disease"/>
+    <category term="leprosy"/>
+    <category term="mycobacterium leprae"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959775"/>
+    <author>
+      <name>Beth Mole</name>
+    </author>
+  </entry>
+  <entry>
+    <title>Author discovers AI-generated counterfeit books written in her name on Amazon</title>
+    <published>2023-08-08T21:09:12+00:00</published>
+    <updated>2023-08-08T21:09:12+00:00</updated>
+    <id>https://arstechnica.com/?p=1959662</id>
+    <summary type="html">Amazon resisted a removal request, citing lack of &quot;trademark registration numbers.&quot;</summary>
+    <category term="AI"/>
+    <category term="Biz &amp; IT"/>
+    <category term="Culture"/>
+    <category term="Tech"/>
+    <category term="Amazon"/>
+    <category term="goodreads"/>
+    <category term="Jane Friedman"/>
+    <category term="machine learning"/>
+    <category term="spam"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959662"/>
+    <author>
+      <name>Benj Edwards</name>
+    </author>
+  </entry>
+  <entry>
+    <title>With new Game Controller app, Netflix games move from mobile to the TV</title>
+    <published>2023-08-08T20:56:55+00:00</published>
+    <updated>2023-08-08T20:56:55+00:00</updated>
+    <id>https://arstechnica.com/?p=1959645</id>
+    <summary type="html">The streamer promises you'll be able to use it to play games on your TV soon.</summary>
+    <category term="Gaming"/>
+    <category term="Tech"/>
+    <category term="App Store"/>
+    <category term="Netflix"/>
+    <category term="netflix games"/>
+    <category term="streaming"/>
+    <link rel="alternate" type="text/html" href="https://arstechnica.com/?p=1959645"/>
+    <author>
+      <name>Samuel Axon</name>
+    </author>
+  </entry>
+</feed>
