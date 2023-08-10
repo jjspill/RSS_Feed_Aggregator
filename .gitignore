@@ -7,3 +7,4 @@ output.txt
 profile_results.prof
 project/testing/*
 project/rss-feeds/testing/*
+*cache.db
