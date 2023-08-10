@@ -25,6 +25,22 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     pip3 install -r requirements.txt
     ```
 
+5. **Add Tokens**
+    Create a new file in the root directory and name it `tokens.env`.
+    Open the `tokens.env` file in a text editor.
+    Add the following lines to the file, replacing `<...>` with your actual values:
+    ```
+    AIRTABLE_API_KEY = <Your Airtable API Key>
+    AIRTABLE_BASE_ID = <Your Base ID>
+    ```
+
+6. **Edit generator_helper.py**
+    Edit the global constants `TABLE_NAME` and `TABLE_FIELDS` to reflect the table and fields you wish to use.
+    ```
+    TABLE_NAME = "Table Name"
+    TABLE_FIELDS = ["table fields", ...]
+    ```
+
 ## Running the Aggregator
 
 1. **Activate the virtual environment if you've set it up**:

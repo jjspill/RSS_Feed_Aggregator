@@ -1,223 +1,326 @@
+import helpers.cache.caching_helper as cacher
 import xml.etree.ElementTree as ET
-import helpers.cache_helper as cacher
-from xml.dom import minidom
+from dateutil.parser import parse
+from datetime import datetime, timezone
+import xml.dom.minidom
 import feedparser
 import yaml
+import os
+import re
 
 
-def create_entries_element(root, entries):
+def is_valid_atom_id(atom_id):
+    # URI and URN format
+    uri_pattern = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*://.*$")
+    urn_pattern = re.compile(r"^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:.*$")
+
+    return (
+        uri_pattern.match(atom_id) is not None
+        or urn_pattern.match(atom_id) is not None
+    )
+
+
+def is_atom_time(date_str):
+    try:
+        # Parse the string in RFC-3339 format
+        datetime.fromisoformat(date_str)
+        return True
+    except ValueError:
+        return False
+
+
+def custom_timezone_parser(time_string):
+    """Attempts to parse the time_string with timezone info."""
+    tzinfo_map = {"UT": "UTC"}
+    try:
+        return parse(time_string)
+    except ValueError:
+        return parse(time_string, tzinfos=tzinfo_map)
+
+
+def create_xml(entries, feed_data):
     """
-    Create and add entry elements to root element.
-    """
-    # Iterate over each entry
-    for entry in entries:
-        # Create entry element
-        entry_element = ET.SubElement(root, "entry")
-
-        # Entry Title
-        if "title" in entry:
-            title = ET.SubElement(entry_element, "title")
-            title.text = entry["title"]
-
-        # Entry Links
-        if "links" in entry:
-            for link_data in entry["links"]:
-                ET.SubElement(entry_element, "link", attrib=link_data)
-
-        # Entry Summary
-        if "summary" in entry:
-            summary = ET.SubElement(
-                entry_element, "summary", attrib={"type": "html"}
-            )
-            summary.text = entry["summary"]
-
-        # Entry Updated
-        if "updated" in entry:
-            updated = ET.SubElement(entry_element, "updated")
-            updated.text = entry["updated"]
-
-        # Entry Tags/Categories
-        if "tags" in entry:
-            for tag in entry["tags"]:
-                attrib = {
-                    "scheme": tag.get("scheme"),
-                    "label": tag.get("label"),
-                    "term": tag.get("term"),
-                }
-                ET.SubElement(entry_element, "category", attrib=attrib)
-
-        # Entry ID
-        if "id" in entry:
-            id_elem = ET.SubElement(entry_element, "id")
-            id_elem.text = entry["id"]
-
-    return root
-
-
-def convert_all_to_xml(header, entries):
-    """
-    Convert header and entries data to XML.
+    Create XML string from feed entries.
     """
     root = ET.Element("feed", xmlns="http://www.w3.org/2005/Atom")
 
-    # Convert and add feed metadata to XML root
+    ET.SubElement(root, "title").text = feed_data["title"]
+    ET.SubElement(root, "id").text = feed_data["id"]
+    ET.SubElement(root, "updated").text = feed_data["updated"]
 
-    # Feed Title
-    if "title" in header:
-        title = ET.SubElement(root, "title")
-        title.text = header["title"]
+    for entry in entries:
+        entry_element = ET.SubElement(root, "entry")
 
-    # Feed Links
-    if "links" in header:
-        for link in header["links"]:
-            ET.SubElement(root, "link", attrib=link)
+        # Handle Title
+        if entry.get("title"):
+            ET.SubElement(entry_element, "title").text = entry["title"]
+        else:
+            ET.SubElement(entry_element, "title").text = "No title"
 
-    # Feed ID
-    if "id" in header:
-        id_elem = ET.SubElement(root, "id")
-        id_elem.text = header["id"]
+        # Handle published
+        if entry.get("published"):
+            if is_atom_time(entry["published"]):
+                ET.SubElement(entry_element, "published").text = entry[
+                    "published"
+                ]
+            else:
+                parsed_date = custom_timezone_parser(entry["published"])
+                ET.SubElement(
+                    entry_element, "published"
+                ).text = parsed_date.replace(tzinfo=timezone.utc).isoformat()
+        else:
+            ET.SubElement(entry_element, "published").text = feed_data[
+                "updated"
+            ]
 
-    # Feed Author
-    if "author" in header:
-        author = ET.SubElement(root, "author")
-        if "name" in header["author"]:
-            name = ET.SubElement(author, "name")
-            name.text = header["author"]["name"]
-        if "email" in header["author"]:
-            email = ET.SubElement(author, "email")
-            email.text = header["author"]["email"]
+        # Handle updated
+        if entry.get("updated"):
+            if is_atom_time(entry["updated"]):
+                ET.SubElement(entry_element, "updated").text = entry["updated"]
+            else:
+                parsed_date = custom_timezone_parser(entry["updated"])
+                ET.SubElement(
+                    entry_element, "updated"
+                ).text = parsed_date.replace(tzinfo=timezone.utc).isoformat()
+        else:
+            ET.SubElement(entry_element, "updated").text = feed_data["updated"]
 
-    # Feed Updated
-    if "updated" in header:
-        updated = ET.SubElement(root, "updated")
-        updated.text = header["updated"]
+        # Handle ID
+        if entry.get("id") and is_valid_atom_id(entry["id"]):
+            ET.SubElement(entry_element, "id").text = entry["id"]
+        else:
+            ET.SubElement(entry_element, "id").text = f"urn:tag:{entry['id']}"
 
-    # Add entries to root element
-    root = create_entries_element(root, entries)
+        # Handle summary
+        summary_data = entry.get("summary")
+        if summary_data:
+            type_mapping = {
+                "text/plain": "text",
+                "text/html": "html",
+                "application/xhtml+xml": "xhtml",
+            }
+            summary_type = type_mapping.get(
+                entry.get("summary_detail", {}).get("type"), "text"
+            )  # default to text
 
-    # Beautify XML for better readability
-    xml_content = ET.tostring(
-        root, encoding="ISO-8859-1", method="xml"
-    ).decode("ISO-8859-1")
-    dom = minidom.parseString(xml_content)
-    pretty_xml = dom.toprettyxml(indent="  ", encoding="ISO-8859-1").decode(
-        "ISO-8859-1"
+            ET.SubElement(
+                entry_element, "summary", type=summary_type
+            ).text = summary_data
+
+        # Handle enclosures
+        for enclosure in entry.get("enclosures", []):
+            link_data = {
+                "rel": "enclosure",
+                "type": enclosure.get(
+                    "type", "text/html"
+                ),  # Default to "text/html"
+                "length": str(
+                    enclosure.get("length", "")
+                ),  # Default to empty string
+                "href": enclosure["href"],
+            }
+            ET.SubElement(entry_element, "link", **link_data)
+
+        # Handle tags
+        for tag in entry.get("tags", []):
+            attrib_data = {
+                "scheme": tag.get("scheme", ""),  # Default to empty
+                "label": tag.get("label", ""),  # Default to empty
+                "term": tag.get("term", ""),  # Default to empty
+            }
+            ET.SubElement(entry_element, "category", **attrib_data)
+
+        # Handle link
+        link_data = entry.get("link")
+        if link_data:
+            link_attributes = {
+                "rel": entry.get("rel", "alternate"),  # default to alternate
+                "type": entry.get(
+                    "type", "text/html"
+                ),  # default to "text/html"
+                "href": link_data,
+            }
+            ET.SubElement(entry_element, "link", **link_attributes)
+        else:
+            ET.SubElement(
+                entry_element,
+                "link",
+                rel="alternate",
+                type="text/html",
+                href="feed_data['id']",
+            )
+
+        # Handle author
+        author = ET.SubElement(entry_element, "author")
+        if feed_data["author"]:
+            ET.SubElement(author, "name").text = feed_data["author"]
+        else:
+            ET.SubElement(author, "name").text = "Anonymous"
+
+    xml_string = ET.tostring(
+        root, encoding=feed_data["encoding"], method="xml"
+    )
+    dom = xml.dom.minidom.parseString(xml_string)
+    return dom.toprettyxml(indent="  ", encoding=feed_data["encoding"]).decode(
+        feed_data["encoding"]
     )
 
-    return pretty_xml
 
-
-def output_feeds(slug, header, entries):
+def output_feeds(slug, entries, feed_data, caching):
     """
     Output XML feeds to files.
     """
     output_file = f"rss-feeds/{slug}-feed.xml"
-    with open(output_file, "w") as f:
-        xml_str = convert_all_to_xml(header, entries)
-        f.write(xml_str)
+    xml = create_xml(entries, feed_data)
 
+    if not caching:
+        with open(output_file, "w") as f:
+            f.write(xml)
+        return
 
-def extract_header_data(feed):
-    """
-    Extract header details from feed metadata.
-    """
-    header_data = {}
+    if os.path.exists(output_file):
+        with open(output_file, "r") as f:
+            with open("newfile.txt", "w") as f2:
+                f2.write(xml)
+                f2.write(f.read())
+        os.remove(output_file)
+    else:
+        with open("newfile.txt", "w") as f2:
+            f2.write(xml)
 
-    if hasattr(feed, "title"):
-        header_data["title"] = feed.title
-    if hasattr(feed, "links"):
-        header_data["links"] = [
-            {"rel": link.rel, "href": link.href} for link in feed.links
-        ]
-    if hasattr(feed, "id"):
-        header_data["id"] = feed.id
-
-    author_data = {}
-    if hasattr(feed, "author_detail"):
-        if hasattr(feed.author_detail, "name"):
-            author_data["name"] = feed.author_detail.name
-        if hasattr(feed.author_detail, "email"):
-            author_data["email"] = feed.author_detail.email
-    if author_data:
-        header_data["author"] = author_data
-
-    if hasattr(feed, "updated"):
-        header_data["updated"] = feed.updated
-
-    return header_data
+    os.rename("newfile.txt", output_file)
 
 
 def check_keywords(entry, match_keywords, exclude_keywords):
     """
     Check if entry matches a keyword and does not contain excluded keywords.
     """
-    content_to_check = " ".join(
-        [
-            entry.get("title", ""),
-            entry.get("link", ""),
-            entry.get("description", ""),
-            entry.get("author", ""),
-            ",".join(entry.get("category", [])),
-            entry.get("comments", ""),
-            entry.get("guid", ""),
-            entry.get("pubDate", ""),
-            entry.get("source", {}).get("title", ""),
-        ]
+    entry_string = str(entry).lower()
+    return any(
+        keyword.lower() in entry_string for keyword in match_keywords
+    ) and not any(
+        keyword.lower() in entry_string for keyword in exclude_keywords
     )
 
-    return any(
-        keyword in content_to_check for keyword in match_keywords
-    ) and not any(keyword in content_to_check for keyword in exclude_keywords)
+
+def filter_feed_entries(feed, match_keywords, exclude_keywords, last_seen_id):
+    """
+    Filters feed entries based on provided keywords and stops processing once reaching last_seen_id
+    """
+    print("==== Filtering feed entries")
+    entries = []
+    for entry in feed.entries:
+        if entry["id"] == last_seen_id:
+            print("==== Reached last seen entry. Skipping older entries")
+            break
+        if check_keywords(entry, match_keywords, exclude_keywords):
+            entries.append(entry)
+    return entries
 
 
-def process_feed_url(config, url, last_seen_id, caching):
-    """Process individual feed URL and return filtered entries."""
-    config_filtered_entries = []
-    parsed_header_data = {}
-    match_keywords = config["match"]
-    exclude_keywords = config["exclude"]
-
+def process_feed_url(config, url, caching=True):
     print(f"==== Fetching and parsing URL: {url}")
+
+    # Attempt to get cache data once if caching is enabled
+    cache_data = cacher.fetch_cache(url) if caching else None
+    last_seen_id, etag_value, last_modified_value = cache_data or (
+        None,
+        None,
+        None,
+    )
+
+    if cache_data:
+        print("==== Cached entry found")
+    else:
+        print("==== No cached entry found")
+
     try:
-        feed = feedparser.parse(url)
+        print("==== Initiating feed fetch and parse")
+        feed = feedparser.parse(
+            url, etag=etag_value, modified=last_modified_value
+        )
+        print(f"==== Cached etag: {etag_value}")
+        print(f"==== Cached last modified: {last_modified_value}")
 
-        # Extract header data from feed metadata
-        parsed_header_data = extract_header_data(feed.feed)
+        # Check for unmodified feed
+        if hasattr(feed, "status") and feed.status == 304:
+            print("==== Feed has not been modified since the last request")
+            return {}, []
 
-        # Filter entries based on keywords (for each URL)
-        for entry in feed.entries:
-            # If entry ID matches last seen ID, stop processing
-            if entry["id"] == last_seen_id and caching:
-                print("==== Reached last seen entry. Skipping older entries.")
-                break
-            if check_keywords(entry, match_keywords, exclude_keywords):
-                config_filtered_entries.append(entry)
+        else:
+            print("==== Feed has been modified since the last request")
 
-        # After processing all the entries for this feed, update the last seen ID.
+        match_keywords = config["match"]
+        exclude_keywords = config["exclude"]
+        config_filtered_entries = filter_feed_entries(
+            feed, match_keywords, exclude_keywords, last_seen_id
+        )
+
+        # Data for return RSS feed
+        # only acquire if feed has not been parsed before
+        feed_data = {
+            "encoding": None,
+            "title": None,
+            "id": None,
+            "updated": None,
+            "author": None,
+        }
+
+        if feed.encoding:
+            feed_data["encoding"] = feed.encoding
+        else:
+            feed_data["encoding"] = "utf-8"
+
+        feed_data["title"] = "Latest Updates"
+
+        if feed.feed.get("id"):
+            feed_data["id"] = feed.feed.get("id")
+        else:
+            feed_data["id"] = url
+
+        feed_data["updated"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        if feed.feed.get("author_detail"):
+            if feed.feed.get("author_detail").get("name"):
+                feed_data["author"] = feed.feed.get("author_detail").get(
+                    "name"
+                )
+        else:
+            feed_data["author"] = "Anonymous"
+
         if config_filtered_entries:
             print(
                 f"==== Found {len(config_filtered_entries)} new entries for URL: {url}"
             )
+        else:
+            print(f"==== No new entries found for URL: {url}")
 
-            if caching:
-                cacher.update_last_seen_id(
-                    config["slug"], url, config_filtered_entries[0]["id"]
-                )
-                print(
-                    f"==== Updated cache with latest entry ID for {config['slug']}."
-                )
+        # Update cache if there's a change and if caching is enabled
+        if caching:
+            new_last_seen_id = feed.entries[0]["id"] if feed.entries else None
+            new_etag = getattr(feed, "etag", None)
+            new_last_modified = getattr(feed, "modified", None)
+            print(f"==== New etag: {new_etag}")
+            print(f"==== New last modified: {new_last_modified}")
+            cacher.update_cache(
+                url, new_last_seen_id, new_etag, new_last_modified
+            )
+            print(f"==== Updated cache for {url}")
+
+        return config_filtered_entries, feed_data
 
     except Exception as e:
         print(f"==== Error processing URL {url}: {e}")
-
-    return parsed_header_data, config_filtered_entries
+        return {}, []
 
 
 def process_yaml(caching):
     """
     Main function to process configuration from YAML and extract RSS feeds.
     """
-    print("==== Starting to process configurations...")
+    print("==== Starting to process configurations")
+    if caching:
+        cacher.setup_database()
 
     with open("yaml-config/rss_config.yaml", "r") as f:
         yaml_config = yaml.safe_load(f)
@@ -227,35 +330,23 @@ def process_yaml(caching):
         print(f"==== Processing configuration for slug: {config['slug']}")
 
         aggregated_entries = []
-        parsed_header_data = {}
 
         # Iterate over each URL in configuration
         for url in config["urls"]:
-            last_seen_id = cacher.get_last_seen_id(config["slug"], url)
-            if last_seen_id and caching:
-                print(
-                    f"==== Last seen entry ID for {config['slug']}: {last_seen_id}"
-                )
-            elif caching:
-                print(f"==== No cached entry found for {config['slug']}")
-            else:
-                print("==== Caching disabled. Processing all entries.")
-
-            parsed_data, filtered_entries = process_feed_url(
-                config, url, last_seen_id, caching
+            filtered_entries, feed_data = process_feed_url(
+                config, url, caching
             )
             aggregated_entries.extend(filtered_entries)
-            if not parsed_header_data:
-                parsed_header_data = parsed_data
 
         # Output filtered entries to XML file
         print(
-            f"==== Found a total of {len(aggregated_entries)} new entries for {config['slug']}."
+            f"==== Found a total of {len(aggregated_entries)} new entries for {config['slug']}"
         )
-        output_feeds(config["slug"], parsed_header_data, aggregated_entries)
+        output_feeds(config["slug"], aggregated_entries, feed_data, caching)
 
         print(
             f"==== Finished processing configuration for slug: {config['slug']}"
         )
+        print("==== ")
 
-    print("==== Finished processing all configurations.")
+    print("==== Finished processing all configurations")
