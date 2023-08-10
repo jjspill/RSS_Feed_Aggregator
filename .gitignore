@@ -5,6 +5,4 @@
 output.txt
 *.calltree
 profile_results.prof
-project/cache/*
 project/testing/*
-project/airtable-config/*
