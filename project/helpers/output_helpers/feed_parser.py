@@ -51,6 +51,11 @@ def check_keywords(entry, match_keywords, exclude_keywords):
     Check if entry matches a keyword and does not contain excluded keywords.
     """
     entry_string = str(entry).lower()
+    if not match_keywords:
+        return not any(
+            keyword.lower() in entry_string for keyword in exclude_keywords
+        )
+
     return any(
         keyword.lower() in entry_string for keyword in match_keywords
     ) and not any(
@@ -67,7 +72,7 @@ def filter_feed_entries(
     print("==== Filtering feed entries")
     entries = []
     for entry in feed.entries:
-        if caching and entry["id"] == last_seen_id:
+        if entry.get("id") and caching and entry["id"] == last_seen_id:
             print("==== Reached last seen entry. Skipping older entries")
             break
         if check_keywords(entry, match_keywords, exclude_keywords):
@@ -77,9 +82,9 @@ def filter_feed_entries(
 
 def process_feed_url(config, url, caching=False):
     print(f"==== Fetching and parsing URL: {url}")
-
-    # Attempt to get cache data once if caching is enabled
-    cache_data = cacher.fetch_cache(url) if caching else None
+    slug_url = config["slug"] + url
+    # Attempt to get cache data if caching is enabled
+    cache_data = cacher.fetch_cache(slug_url) if caching else None
     last_seen_id, etag_value, last_modified_value = cache_data or (
         None,
         None,
@@ -102,11 +107,12 @@ def process_feed_url(config, url, caching=False):
             print("==== Feed has not been modified since the last request")
             return {}, []
 
-        elif caching:
-            print("==== Feed has been modified since the last request")
+        elif caching and cache_data:
+            print("==== Cannot determine if feed has been modified")
 
-        match_keywords = config["match"]
-        exclude_keywords = config["exclude"]
+        match_keywords = config.get("match", [])
+        exclude_keywords = config.get("exclude", [])
+
         config_filtered_entries = filter_feed_entries(
             feed, match_keywords, exclude_keywords, last_seen_id, caching
         )
@@ -122,16 +128,24 @@ def process_feed_url(config, url, caching=False):
 
         # Update cache if there's a change and if caching is enabled
         if caching:
-            new_last_seen_id = feed.entries[0]["id"] if feed.entries else None
+            if feed.entries[0].get("id"):
+                new_last_seen_id = (
+                    feed.entries[0]["id"] if feed.entries else None
+                )
+            else:
+                new_last_seen_id = (
+                    feed.entries[0]["link"] if feed.entries else None
+                )
+
             new_etag = getattr(feed, "etag", None)
             new_last_modified = getattr(feed, "modified", None)
             cacher.update_cache(
-                url, new_last_seen_id, new_etag, new_last_modified
+                slug_url, new_last_seen_id, new_etag, new_last_modified
             )
             print(f"==== Updated cache for {url}")
 
         return config_filtered_entries, feed_data
 
     except Exception as e:
-        print(f"==== Error processing URL {url}: {e}")
+        print(f"==== ERROR processing URL {url}: {e}")
         return {}, []

@@ -1,11 +1,14 @@
-import helpers.generator_helpers.yaml_writer as generator
-import helpers.aggregator_helpers.yaml_parser as aggregator
+import helpers.input_helpers.yaml_writer as generator
+import helpers.output_helpers.yaml_parser as aggregator
 import argparse
 
-# import cProfile
+
+def run_(caching=False):
+    generator.generate_yaml()
+    aggregator.process_yaml(caching)
 
 
-def main():
+def cli_main():
     parser = argparse.ArgumentParser(description="RSS Feed Aggregator")
     parser.add_argument(
         "--cache",
@@ -16,10 +19,8 @@ def main():
 
     caching = args.cache
 
-    generator.generate_yaml()
-    aggregator.process_yaml(caching)
+    run_(caching)
 
 
 if __name__ == "__main__":
-    # cProfile.run("main()", "profile_results.prof")
-    main()
+    cli_main()

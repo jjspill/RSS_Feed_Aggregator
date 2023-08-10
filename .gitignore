@@ -6,3 +6,4 @@ output.txt
 *.calltree
 profile_results.prof
 project/testing/*
+project/rss-feeds/testing/*

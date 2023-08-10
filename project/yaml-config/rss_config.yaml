@@ -1,21 +1,21 @@
 -   name: BusinessWire
     match:
-    - 3d
-    - dismiss
-    - manufacture
+        - 3d
+        - dismiss
+        - manufacture
     exclude:
-    - capital
+        - capital
     urls:
-    - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFtRWA==
-    - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeGFNTXg==
+        - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFtRWA==
+        - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeGFNTXg==
     slug: businesswire
 -   name: S-1 and S-4 Filings
     match:
-    - 0000019617
-    - gs finance
+        - 0000019617
+        - gs finance
     exclude:
-    - '0000070502'
+        - '0000070502'
     urls:
-    - https://secinternal.ipoinsider.com/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=424B&company=&dateb=&owner=include&start=0&count=40&output=atom
-    - https://secinternal.ipoinsider.com/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=424B3&company=&dateb=&owner=include&start=0&count=40&output=atom
+        - https://secinternal.ipoinsider.com/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=424B&company=&dateb=&owner=include&start=0&count=40&output=atom
+        - https://secinternal.ipoinsider.com/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=424B3&company=&dateb=&owner=include&start=0&count=40&output=atom
     slug: s1-s4

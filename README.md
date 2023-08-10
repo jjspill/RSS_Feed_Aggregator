@@ -9,12 +9,12 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     git clone https://github.com/jjspill/RSS_Feed_Aggregator.git
     ```
 
-2. **Navigate to the Project Directory:**
+2. **Navigate to the Repository:**
     ```bash
     cd /path/to/RSS_Feed_Aggregator
     ```
 
-3. **Set Up a Virtual Environment:** (Highly Recommended)
+3. **Set Up and Start a Virtual Environment:** (Highly Recommended)
     ```bash
     python3 -m venv env
     source env/bin/activate
@@ -40,25 +40,45 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 
 ## Running the RSS Aggregator
 
-1. **Activate the Virtual Environmentp:**
+1. **Activate the Virtual Environment:** (it might be active already)
     ```bash
     source env/bin/activate
     ```
-
-3. **Run the Aggregator without Caching:** (default mode)
+2. **Navigate to the project directory**
     ```bash
-    python3 project/main.py
+    cd /path/to/RSS_Feed_Aggregator/project
     ```
+
+3. **Run the Aggregator without Caching:** (default mode)  
     This mode fetches and processes all RSS feed entries regardless of whether they've been processed previously.
+    ```bash
+    python3 project/aggregator.py
+    ```
+
+    aggregator.py can also be imported and called directly. The default value is without caching.
+    ```python
+    import aggregator
+
+    aggregator.run()
+    aggregator.run(False)
+    ```
+    
 
 4. **Run the Aggregator with Caching:**
     ```bash
-    python3 project/main.py --cache
+    python3 project/aggregator.py --cache
     ```
-    With the `--cache` flag, the aggregator uses caching to improve speed. Before fetching new data, it first checks the ETag and Last-Modified headers to identify any changes since the last fetch. If no changes are detected, previously processed entries are skipped, ensuring that the aggregator only processes new or updated entries.
+    With the `--cache` flag, the Aggregator uses caching to improve speed. Before fetching new data, it first checks the ETag and Last-Modified headers to identify any changes since the last fetch. If no changes are detected, previously processed entries are skipped, ensuring that the Aggregator only processes new or updated entries.
+
+    To import and call with caching, call with a True parameter.
+    ```python
+    import aggregator
+
+    aggregator.run(True)
+    ```
+    
 
 5. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**
 
 ## Notes
-- **Input Feeds**
-    - The Aggregator can take both RSS and Atom feeds as input, but it will always output a valid Atom feed.
+- **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed.**

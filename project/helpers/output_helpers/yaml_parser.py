@@ -1,6 +1,6 @@
 import helpers.cache_helpers.cacher as cacher
-import helpers.aggregator_helpers.feed_parser as parser
-import helpers.aggregator_helpers.feed_writer as writer
+import helpers.output_helpers.feed_parser as parser
+import helpers.output_helpers.feed_writer as writer
 
 import yaml
 
@@ -34,9 +34,13 @@ def process_yaml(caching):
         print(
             f"==== Found a total of {len(aggregated_entries)} new entries for {config['slug']}"
         )
-        writer.output_feeds(
-            config["slug"], aggregated_entries, feed_data, caching
-        )
+
+        if aggregated_entries:
+            writer.output_feed(
+                config["slug"], aggregated_entries, feed_data, caching
+            )
+        else:
+            print(f"==== No new entries found for {config['slug']}")
 
         print(
             f"==== Finished processing configuration for slug: {config['slug']}"
