@@ -25,20 +25,17 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     pip3 install -r requirements.txt
     ```
 
-5. **Add Tokens**
-    Create a new file in the root directory and name it `tokens.env`.
-    Open the `tokens.env` file in a text editor.
+5. **Add airtable config file**
+    Create a new file in the airtable-config directory and name it `airtable_config.json`.
+    Open the `airtable_config.json` file in a text editor.
     Add the following lines to the file, replacing `<...>` with your actual values:
-    ```
-    AIRTABLE_API_KEY = <Your Airtable API Key>
-    AIRTABLE_BASE_ID = <Your Base ID>
-    ```
-
-6. **Edit generator_helper.py**
-    Edit the global constants `TABLE_NAME` and `TABLE_FIELDS` to reflect the table and fields you wish to use.
-    ```
-    TABLE_NAME = "Table Name"
-    TABLE_FIELDS = ["table fields", ...]
+    ```json
+    {
+	    "AIRTABLE_API_KEY":"<Your Airtable API Key>",
+	    "AIRTABLE_BASE_ID":"<Your Base ID>",
+	    "AIRTABLE_TABLE_NAME":"<Your Airtable Table Name>",
+	    "AIRTABLE_VIEW_NAME":"<Your Airtable Grid Name>"
+    }
     ```
 
 ## Running the Aggregator
@@ -58,6 +55,6 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```bash
     python3 main.py --cache
     ```
-    With the `--cache` flag, the aggregator uses caching to improve speed. Entries that have been processed during previous runs will be skipped, ensuring that only new or updated entries are processed.
+    With the `--cache` flag, the aggregator uses caching to improve speed. Before fetching new data, it first checks the ETag and Last-Modified headers to identify any changes since the last fetch. If no changes are detected, previously processed entries are skipped, ensuring that the aggregator only processes new or updated entries.
 
 4. **The results will be saved in the `rss-feeds` directory as XML files, categorized by their respective slugs**

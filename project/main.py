@@ -1,5 +1,5 @@
-import helpers.generator_helper as generator
-import helpers.aggregator_helper as aggregator
+import helpers.generator_helpers.yaml_writer as generator
+import helpers.aggregator_helpers.yaml_parser as aggregator
 import argparse
 
 # import cProfile

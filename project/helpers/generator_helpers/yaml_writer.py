@@ -52,7 +52,6 @@ def process_table_data(data):
     Strip whitespace from list items in table data.
     """
     try:
-        print("==== Processing table data")
         for field, value in data.items():
             if isinstance(value, list):
                 data[field] = [item.strip() for item in value]
@@ -88,7 +87,8 @@ def generate_yaml():
         return
 
     else:
-        print("==== Data found in Airtable. Processing")
+        print("==== Data found in Airtable, writing to YAML file")
+        print("==== ")
         # Save data as YAML file
         with open("yaml-config/rss_config.yaml", "w") as f:
             f.write(
