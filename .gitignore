@@ -3,6 +3,7 @@
 *.vscode
 .DS_Store
 output.txt
+o.txt
 *.calltree
 profile_results.prof
 project/testing/*
