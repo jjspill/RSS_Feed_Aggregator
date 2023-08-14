@@ -3,9 +3,9 @@ import helpers.output_helpers.yaml_parser as aggregator
 import argparse
 
 
-def run_(caching=False, entries_only=False):
+def run_(cache=False, entries_only=False):
     generator.generate_yaml()
-    aggregator.process_yaml(caching, entries_only)
+    aggregator.process_yaml(cache, entries_only)
 
 
 def cli_main():

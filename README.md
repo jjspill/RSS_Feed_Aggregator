@@ -60,7 +60,7 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     import aggregator
 
     aggregator.run()
-    aggregator.run(False)
+    aggregator.run(cache=False)
     ```
     
 
@@ -74,11 +74,34 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```python
     import aggregator
 
-    aggregator.run(True)
+    aggregator.run(cache=True)
     ```
-    
+
+5. **Alter the output of the Aggregator:**
+    ```bash
+    python3 project/aggregator.py --entries-only
+    ```
+    With the `--entries-only` flag, the Aggregator ouputs the relevant entries only in the format of the feed inputted. Only the `<entry>` or `<item>` tags and the data within them will be outputted.
+
+    To import and call with entries_only, call with a True parameter.
+    ```python
+    import aggregator
+
+    aggregator.run(entries_only=True)
+    ```
 
 5. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**
 
 ## Notes
-- **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed.**
+- **The default way the Aggregator runs is without caching and without the entries_only flag (so it produces valid Atom feeds).**
+- **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if entries_only is False.**
+- **The Aggregator and cache will work with both entries_only = True or False, just keep in mind switching this field will cause problems with how the cached feeds / entries are merged with the new ones.**
+- **All possible ways to run the aggregator are below:**
+```python
+    import aggregator
+
+    aggregator.run(cache=True, entries_only=True)
+    aggregator.run(cache=True, entries_only=False)
+    aggregator.run(cache=False, entries_only=True)
+    aggregator.run(cache=False, entries_only=False)
+```
