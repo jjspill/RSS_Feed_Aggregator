@@ -1,7 +1,8 @@
 from pyairtable import Api
+import requests
 import yaml
 import json
-import requests
+import os
 
 
 class MyDumper(yaml.Dumper):
@@ -149,6 +150,10 @@ def generate_yaml():
     print("==== Data found in Airtable, writing to YAML file")
     print("==== ")
     # Save data as YAML file
+
+    if not os.path.exists("yaml-config"):
+        os.makedirs("yaml-config")
+
     with open("yaml-config/rss_config.yaml", "w") as f:
         f.write(
             yaml.dump(
