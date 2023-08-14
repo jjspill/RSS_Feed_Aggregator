@@ -9,3 +9,4 @@ profile_results.prof
 project/testing/*
 project/rss-feeds/testing/*
 project/helpers/cache_helpers/cache.db
+*xml

@@ -105,10 +105,13 @@ def process_feed_url(config, url, caching=False):
         # Check for unmodified feed
         if caching and hasattr(feed, "status") and feed.status == 304:
             print("==== Feed has not been modified since the last request")
-            return {}, []
+            return {}, [], None
 
         elif caching and cache_data:
             print("==== Cannot determine if feed has been modified")
+
+        # Check for feed type
+        feed_type = "rss" if feed.version.startswith("rss") else "atom"
 
         match_keywords = config.get("match", [])
         exclude_keywords = config.get("exclude", [])
@@ -144,7 +147,7 @@ def process_feed_url(config, url, caching=False):
             )
             print(f"==== Updated cache for {url}")
 
-        return config_filtered_entries, feed_data
+        return config_filtered_entries, feed_data, feed_type
 
     except Exception as e:
         print(f"==== ERROR processing URL {url}: {e}")

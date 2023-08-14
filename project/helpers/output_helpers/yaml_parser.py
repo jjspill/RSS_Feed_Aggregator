@@ -7,7 +7,7 @@ import requests
 import yaml
 
 
-def process_yaml(caching):
+def process_yaml(caching=False, entries_only=False):
     """
     Main function to process configuration from YAML and extract feeds.
     """
@@ -24,10 +24,11 @@ def process_yaml(caching):
         print(f"==== Processing configuration for slug: {config['slug']}")
 
         aggregated_entries = []
+        feed_type = "atom"
 
         # Iterate over each URL in configuration
         for url in config["urls"]:
-            filtered_entries, feed_data = parser.process_feed_url(
+            filtered_entries, feed_data, feed_type = parser.process_feed_url(
                 config, url, caching
             )
             aggregated_entries.extend(filtered_entries)
@@ -39,7 +40,12 @@ def process_yaml(caching):
 
         if aggregated_entries:
             writer.output_feed(
-                config["slug"], aggregated_entries, feed_data, caching
+                config["slug"],
+                aggregated_entries,
+                feed_data,
+                feed_type,
+                caching,
+                entries_only,
             )
         else:
             print(f"==== No new entries found for {config['slug']}")

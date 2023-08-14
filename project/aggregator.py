@@ -3,9 +3,9 @@ import helpers.output_helpers.yaml_parser as aggregator
 import argparse
 
 
-def run_(caching=False):
+def run_(caching=False, entries_only=False):
     generator.generate_yaml()
-    aggregator.process_yaml(caching)
+    aggregator.process_yaml(caching, entries_only)
 
 
 def cli_main():
@@ -15,11 +15,17 @@ def cli_main():
         action="store_true",
         help="Enable caching to avoid processing old data",
     )
+    parser.add_argument(
+        "--entries-only",
+        action="store_true",
+        help="Print only the relevant entries without Atom formatting",
+    )
     args = parser.parse_args()
 
     caching = args.cache
+    entries_only = args.entries_only
 
-    run_(caching)
+    run_(caching, entries_only)
 
 
 if __name__ == "__main__":
