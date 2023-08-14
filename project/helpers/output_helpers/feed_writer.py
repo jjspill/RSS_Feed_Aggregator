@@ -20,7 +20,9 @@ def output_feed(slug, entries, feed_data, feed_type, caching, entries_only):
 
     xml_output = ""
     if entries_only:
-        process_ET = FeedProcessorSTR(entries, feed_type, output_file)
+        process_ET = FeedProcessorSTR(
+            entries, feed_data, feed_type, output_file
+        )
         process_ET.process_all()
 
         if caching:

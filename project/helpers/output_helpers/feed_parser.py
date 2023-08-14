@@ -98,6 +98,7 @@ def process_feed_url(config, url, caching=False):
 
     try:
         print("==== Initiating feed fetch and parse")
+
         feed = feedparser.parse(
             url, etag=etag_value, modified=last_modified_value
         )

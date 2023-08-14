@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 from dateutil.parser import parse
 import xml.dom.minidom
+import html
 import os
 import re
 
@@ -41,7 +42,7 @@ class FeedProcessorBase(ABC):
         pass
 
     @abstractmethod
-    def process_link(self):
+    def process_links(self):
         pass
 
     @abstractmethod
@@ -83,7 +84,7 @@ class FeedProcessorET(FeedProcessorBase):
             "summary": self.process_summary,
             "enclosures": self.process_enclosures,
             "tags": self.process_tags,
-            "link": self.process_link,
+            "link": self.process_links,
             "author": self.process_author,
         }
         for entry in self.entries:
@@ -189,16 +190,15 @@ class FeedProcessorET(FeedProcessorBase):
             ET.SubElement(self.entry_element, "category", **attrib_data)
 
     # Required
-    def process_link(self):
+    def process_links(self):
         # If link is not present, use feed id
-        link_data = self.entry.get("link", self.feed_data["id"])
-        link_attributes = {
-            "rel": self.entry.get("rel", "alternate"),
-            "type": self.entry.get("type", "text/html"),
-            "href": link_data,
-        }
-
-        ET.SubElement(self.entry_element, "link", **link_attributes)
+        for link in self.entry.get("links", []):
+            link_data = {
+                "rel": link.get("rel", "alternate"),
+                "type": link.get("type", "text/html"),
+                "href": link.get("href", self.feed_data["id"]),
+            }
+            ET.SubElement(self.entry_element, "link", **link_data)
 
     # Required
     def process_author(self):
@@ -237,20 +237,32 @@ class FeedProcessorET(FeedProcessorBase):
         return parse(time_string, tzinfos=tzinfos)
 
     def clean_xml(self, element):
-        """Remove attributes with value None."""
+        """
+        Remove attributes with value None.
+        """
+        if element.text:
+            element.text = element.text.strip()
+
         for child in element:
             self.clean_xml(child)
 
-        for key, value in element.attrib.items():
-            if value is None:
-                del element.attrib[key]
+            if child.tail:
+                child.tail = child.tail.strip()
 
-        self.root = element
+        keys_to_delete = [
+            key for key, value in element.attrib.items() if value is None
+        ]
+        for key in keys_to_delete:
+            del element.attrib[key]
+
+        return element
 
     def prettify_xml(self):
         """
         Prettify XML using minidom.
         """
+        self.root = self.clean_xml(self.root)
+
         encoding = self.feed_data.get("encoding", "utf-8")
         xml_string = ET.tostring(self.root, encoding=encoding, method="xml")
         dom = xml.dom.minidom.parseString(xml_string)
@@ -262,10 +274,18 @@ class FeedProcessorET(FeedProcessorBase):
 
         if os.path.exists(self.output_file):
             try:
-                old_tree = ET.parse(self.output_file)
-                old_root = old_tree.getroot()
+                with open(self.output_file, "r") as f:
+                    content = f.read()
 
-                for entry in old_root.findall("entry"):
+                content = content.replace(
+                    ' xmlns="http://www.w3.org/2005/Atom"', ""
+                )
+
+                old_tree = ET.fromstring(content)
+
+                print("==== Merging with existing file")
+
+                for entry in old_tree.findall("entry"):
                     new_root.append(entry)
 
                 self.root = new_root
@@ -275,19 +295,25 @@ class FeedProcessorET(FeedProcessorBase):
                     f"The file {self.output_file} could not be parsed and will be overwritten."
                 )
 
+            except Exception as e:
+                print(f"==== ERROR: {e}")
+
     def get_xml(self):
         return self.prettify_xml()
 
 
 class FeedProcessorSTR(FeedProcessorBase):
-    def __init__(self, entries, feed_type, output_file):
+    def __init__(self, entries, feed_data, feed_type, output_file):
+        self.feed_atom = False
         if feed_type == "rss":
             self.wrapper_tag = "item"
         else:
             self.wrapper_tag = "entry"
+            self.feed_atom = True
 
         self.entries = entries
         self.xml_strings = []
+        self.encoding = feed_data.get("encoding", "utf-8")
         self.output_file = output_file
         super().__init__()
 
@@ -300,7 +326,7 @@ class FeedProcessorSTR(FeedProcessorBase):
             "summary": self.process_summary,
             "enclosures": self.process_enclosures,
             "tags": self.process_tags,
-            "link": self.process_link,
+            "link": self.process_links,
             "author": self.process_author,
         }
         for entry in self.entries:
@@ -313,36 +339,66 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_title(self):
         title = self.entry.get("title")
         if title:
-            self.xml_strings.append(f"  <title>{title}</title>")
+            self.xml_strings.append(f"  <title>{html.escape(title)}</title>")
 
     def process_published(self):
         published = self.entry.get("published")
-        if published:
+        if published and self.feed_atom:
             self.xml_strings.append(f"  <published>{published}</published>")
+        elif published:
+            self.xml_strings.append(f"  <pubDate>{published}</pubDate>")
 
     def process_updated(self):
         updated = self.entry.get("updated")
-        if updated:
+        if updated and self.feed_atom:
             self.xml_strings.append(f"  <updated>{updated}</updated>")
 
     def process_id(self):
         id_value = self.entry.get("id")
-        if id_value:
+        if id_value and self.feed_atom:
             self.xml_strings.append(f"  <id>{id_value}</id>")
+        elif id_value:
+            guidislink = self.entry.get("guidislink", False)
+            self.xml_strings.append(
+                f'  <guid isPermaLink="{guidislink}">{id_value}</guid>'
+            )
 
     def process_summary(self):
         summary = self.entry.get("summary")
-        if summary:
-            self.xml_strings.append(f"  <summary>{summary}</summary>")
+        if summary and self.feed_atom:
+            type_mapping = {
+                "text/plain": "text",
+                "text/html": "html",
+                "application/xhtml+xml": "xhtml",
+            }
+            summary_type = type_mapping.get(
+                self.entry.get("summary_detail", {}).get("type"), "text"
+            )
+            summary = (
+                html.escape(summary) if summary_type == "html" else summary
+            )
+            self.xml_strings.append(
+                f'  <summary type="{summary_type}">{summary}</summary>'
+            )
+        elif summary:
+            self.xml_strings.append(
+                f"  <description>{html.escape(summary)}</description>"
+            )
 
     def process_enclosures(self):
         enclosures = self.entry.get("enclosures", [])
         for enclosure in enclosures:
-            href = enclosure.get("href")
-            type_ = enclosure.get("type")
-            self.xml_strings.append(
-                f'  <enclosure href="{href}" type="{type_}"/>'
-            )
+            href = enclosure.get("href", "")
+            type_ = enclosure.get("type", "")
+            length = enclosure.get("length", "")
+            if self.feed_atom:
+                self.xml_strings.append(
+                    f'  <link rel="enclosure" type="{type_}" length="{length}" href="{href}"/>'
+                )
+            else:
+                self.xml_strings.append(
+                    f'  <enclosure url="{href}" type="{type_}" length="{length}"/>'
+                )
 
     def process_tags(self):
         tags = self.entry.get("tags", [])
@@ -350,22 +406,42 @@ class FeedProcessorSTR(FeedProcessorBase):
             scheme = tag.get("scheme")
             label = tag.get("label")
             term = tag.get("term")
-            self.xml_strings.append(
-                f'  <category scheme="{scheme}" label="{label}" term="{term}"/>'
-            )
 
-    def process_link(self):
-        link = self.entry.get("link")
-        if link:
-            self.xml_strings.append(
-                f'  <link rel="alternate" type="text/html" href="{link}"/>'
-            )
+            if self.feed_atom:
+                self.xml_strings.append(
+                    f'  <category scheme="{scheme}" label="{label}" term="{term}"/>'
+                )
+
+            elif scheme:
+                self.xml_strings.append(
+                    f'  <category domain="{scheme}">{term}</category>'
+                )
+            else:
+                self.xml_strings.append(f"  <category>{term}</category>")
+
+    def process_links(self):
+        for link in self.entry.get("links", []):
+            link_data = {
+                "rel": link.get("rel", "alternate"),
+                "type": link.get("type", "text/html"),
+                "href": link.get("href", ""),
+            }
+
+            if link_data["rel"] == "enclosure":
+                continue
+
+            elif self.feed_atom:
+                self.xml_strings.append(
+                    f'  <link rel="{link_data["rel"]}" type="{link_data["type"]}" href="{link_data["href"]}"/>'
+                )
+            else:
+                self.xml_strings.append(f'  <link>{link_data["href"]}</link>')
 
     def process_author(self):
         author = self.entry.get("author")
         if author:
             self.xml_strings.append(
-                f"  <author>\n    <name>{author}</name>\n  </author>"
+                f"  <author><name>{author}</name></author>"
             )
 
     def get_xml(self):
@@ -373,7 +449,7 @@ class FeedProcessorSTR(FeedProcessorBase):
 
     def cache(self):
         if os.path.exists(self.output_file):
-            with open(self.output_file, "r", encoding="utf-8") as f:
+            with open(self.output_file, "r", encoding=self.encoding) as f:
                 existing_content = f.read()
 
                 self.xml_strings.extend(existing_content.splitlines())
