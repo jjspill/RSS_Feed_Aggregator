@@ -5,7 +5,7 @@ from multiprocessing import Pool
 import yaml
 
 
-def process_yaml(caching=False, entries_only=False):
+def process_yaml(caching=False, entries_only=False, filepath=None):
     """
     Main function to process configuration from YAML and extract feeds.
     """
@@ -14,8 +14,24 @@ def process_yaml(caching=False, entries_only=False):
     if caching:
         cacher.setup_database()
 
-    with open("yaml-config/rss_config.yaml", "r") as f:
-        yaml_config = yaml.safe_load(f)
+    if filepath:
+        try:
+            with open(filepath, "r") as f:
+                yaml_config = yaml.safe_load(f)
+        except FileNotFoundError:
+            print(f"Error: File '{filepath}' not found.")
+            exit(1)
+        except PermissionError:
+            print(
+                f"Error: Permission denied when trying to read '{filepath}'."
+            )
+            exit(1)
+        except yaml.YAMLError as exc:
+            print(f"Error parsing YAML from '{filepath}': {exc}")
+            exit(1)
+    else:
+        with open("yaml-config/rss_config.yaml", "r") as f:
+            yaml_config = yaml.safe_load(f)
 
     # Iterate over each configuration
     for config in yaml_config:
@@ -112,15 +128,33 @@ def reorganize_results(results):
     return reorganized_results.values()
 
 
-def process_yaml_multiprocessing(caching, entries_only):
+def process_yaml_multiprocessing(
+    caching=False, entries_only=False, filepath=None
+):
     print("==== Starting to process configurations using multiprocessing")
     print("==== ")
 
     if caching:
         cacher.setup_database()
 
-    with open("yaml-config/rss_config.yaml", "r") as f:
-        yaml_config = yaml.safe_load(f)
+    if filepath:
+        try:
+            with open(filepath, "r") as f:
+                yaml_config = yaml.safe_load(f)
+        except FileNotFoundError:
+            print(f"Error: File '{filepath}' not found.")
+            exit(1)
+        except PermissionError:
+            print(
+                f"Error: Permission denied when trying to read '{filepath}'."
+            )
+            exit(1)
+        except yaml.YAMLError as exc:
+            print(f"Error parsing YAML from '{filepath}': {exc}")
+            exit(1)
+    else:
+        with open("yaml-config/rss_config.yaml", "r") as f:
+            yaml_config = yaml.safe_load(f)
 
     aggregated_results = []
 

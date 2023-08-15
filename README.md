@@ -58,9 +58,11 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 4. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**
 
 5. **Other Flags**
-- Use `--valid_rss` or `-v` to output a valid atom feed.
-- Use `--no_multiprocessing` or `-n` to disable multiprocessing.
 - Use `--cache` or `-c` to enable caching of past URLs.
+- Use `--valid_rss` or `-v` to output a valid atom feed.
+- Use `--no_multiprocessing` or `-nm` to disable multiprocessing.
+- Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML.
+- Use `--yaml` or `-y` to disable YAML creation and use an already created configuration YAML.
 
 ## Notes
 - **valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.**
