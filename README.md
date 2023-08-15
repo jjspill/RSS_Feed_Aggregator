@@ -1,6 +1,6 @@
 # RSS Feed Aggregator
 
-The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters RSS feed data. It's built to provide an efficient way of gathering specific information from various sources as per the configured filters.
+The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters RSS feed data. It's built to provide an efficient way of gathering specific information from various sources as per the configuration filters.
 
 ## Installation & Setup
 
@@ -44,64 +44,25 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```bash
     source env/bin/activate
     ```
-2. **Navigate to the project directory**
+2. **Navigate to the project directory:**
     ```bash
     cd /path/to/RSS_Feed_Aggregator/project
     ```
 
-3. **Run the Aggregator without Caching:** (default mode)  
-    This mode fetches and processes all RSS feed entries regardless of whether they've been processed previously.
+3. **Run the Aggregator in default mode:**
     ```bash
-    python3 project/aggregator.py
+    python3 aggregator.py
     ```
+    Default mode means that the Aggregator will output entries only and will use multiprocessing to parse and write to files.
 
-    aggregator.py can also be imported and called directly. The default value is without caching.
-    ```python
-    import aggregator
+4. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**
 
-    aggregator.run()
-    aggregator.run(cache=False)
-    ```
-    
-
-4. **Run the Aggregator with Caching:**
-    ```bash
-    python3 project/aggregator.py --cache
-    ```
-    With the `--cache` flag, the Aggregator uses caching to improve speed. Before fetching new data, it first checks the ETag and Last-Modified headers to identify any changes since the last fetch. If no changes are detected, previously processed entries are skipped, ensuring that the Aggregator only processes new or updated entries.
-
-    To import and call with caching, call with a True parameter.
-    ```python
-    import aggregator
-
-    aggregator.run(cache=True)
-    ```
-
-5. **Alter the output of the Aggregator:**
-    ```bash
-    python3 project/aggregator.py --entries-only
-    ```
-    With the `--entries-only` flag, the Aggregator ouputs the relevant entries only in the format of the feed inputted. Only the `<entry>` or `<item>` tags and the data within them will be outputted.
-
-    To import and call with entries_only, call with a True parameter.
-    ```python
-    import aggregator
-
-    aggregator.run(entries_only=True)
-    ```
-
-5. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**
+5. **Other Flags**
+- Use `--valid_rss` or `-v` to output a valid atom feed.
+- Use `--no_multiprocessing` or `-n` to disable multiprocessing.
+- Use `--cache` or `-c` to enable caching of past URLs.
 
 ## Notes
-- **The default way the Aggregator runs is without caching and without the entries_only flag (so it produces valid Atom feeds).**
-- **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if entries_only is False.**
-- **The Aggregator and cache will work with both entries_only = True or False, just keep in mind switching this field will cause problems with how the cached feeds / entries are merged with the new ones.**
-- **All possible ways to run the aggregator are below:**
-```python
-    import aggregator
-
-    aggregator.run(cache=True, entries_only=True)
-    aggregator.run(cache=True, entries_only=False)
-    aggregator.run(cache=False, entries_only=True)
-    aggregator.run(cache=False, entries_only=False)
-```
+- **valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.**
+- **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if valid_rss is enabled.**
+- **The Aggregator and cache will work with any flags just keep in mind changing the cache or valid_rss flags in between consecutive runs will cause problems with how the cached feeds / entries are merged with the new ones.**

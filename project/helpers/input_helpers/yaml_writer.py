@@ -1,8 +1,9 @@
 from pyairtable import Api
-import requests
 import yaml
 import json
 import os
+
+# import requests
 
 
 class MyDumper(yaml.Dumper):
@@ -89,7 +90,11 @@ def validate(data):
         else:
             print(f"==== Record does not have all required fields: {d}")
 
+    return filtered_data  # move to bottom if uncommenting below
+
     # Validate URLs
+    # Commenting because bad URLs are checked after feed is parsed
+    """
     for d in filtered_data:
         urls_to_remove = []
         for url in d["urls"]:
@@ -115,8 +120,7 @@ def validate(data):
                 f"==== Removing record {d['name']} because it has no valid URLs"
             )
             filtered_data.remove(d)
-
-    return filtered_data
+    """
 
 
 def generate_yaml():

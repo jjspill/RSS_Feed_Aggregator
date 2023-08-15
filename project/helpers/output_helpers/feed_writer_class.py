@@ -216,7 +216,7 @@ class FeedProcessorET(FeedProcessorBase):
 
         return (
             uri_pattern.match(atom_id) is not None
-            or urn_pattern.match(atom_id) is not None
+            or urn_pattern.match(atom_id) is not None  # noqa: W503
         )
 
     def is_atom_time(self, date_str):

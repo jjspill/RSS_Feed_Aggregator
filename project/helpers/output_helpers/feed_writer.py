@@ -5,10 +5,11 @@ from helpers.output_helpers.feed_writer_class import (
 import os
 
 
-def output_feed(slug, entries, feed_data, feed_type, caching, entries_only):
+def output_feed(args_list):
     """
     Output XML feeds to respective files.
     """
+    slug, entries, feed_data, feed_type, caching, entries_only = args_list
     if not entries or not feed_data:
         print("==== No entries or feed data found")
         return None

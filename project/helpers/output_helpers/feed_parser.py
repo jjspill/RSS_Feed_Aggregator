@@ -148,6 +148,10 @@ def process_feed_url(config, url, caching=False):
             )
             print(f"==== Updated cache for {url}")
 
+        print(
+            f"==== Found {len(config_filtered_entries)} new entries for URL: {url}"
+        )
+
         return config_filtered_entries, feed_data, feed_type
 
     except Exception as e:
