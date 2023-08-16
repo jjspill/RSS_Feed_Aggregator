@@ -1,4 +1,4 @@
-from helpers.output_helpers.feed_writer_class import (
+from helpers.feed_helpers.feed_writer_class import (
     FeedProcessorET,
     FeedProcessorSTR,
 )
@@ -11,7 +11,6 @@ def output_feed(args_list):
     """
     slug, entries, feed_data, feed_type, caching, entries_only = args_list
     if not entries or not feed_data:
-        print("==== No entries or feed data found")
         return None
 
     if not os.path.exists("rss-feeds"):

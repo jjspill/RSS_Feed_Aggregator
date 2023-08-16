@@ -1,49 +1,21 @@
--   urls:
-        - https://www.npr.org/rss/podcast.php?id=13
-    name: Fresh-Air
-    slug: npr-fa
--   urls:
-        - https://feeds.feedburner.com/TechCrunch/
-    name: TechCrunch
-    slug: tc
--   urls:
-        - http://feeds.arstechnica.com/arstechnica/index/
-    name: Ars Technica
-    slug: ars
--   urls:
-        - http://www.nasa.gov/rss/dyn/breaking_news.rss
-    name: Nasa
-    slug: nasa
--   urls:
-        - http://feeds.feedburner.com/typepad/sethsmainblog
-    name: Seth Godin
-    slug: seth
--   urls:
-        - http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
-    name: NYT-News
-    slug: nyt
--   urls:
+-   name: BusinessWire
+    match:
+        - 3d
+        - dismiss
+        - manufacture
+    exclude:
+        - capital
+    urls:
         - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFtRWA==
         - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeGFNTXg==
-    name: BusinessWire
     slug: businesswire
--   urls:
-        - https://www.wired.com/feed/rss
-    name: wired
-    slug: wired
--   urls:
-        - http://rss.cnn.com/rss/cnn_topstories.rss
-    name: CNN-News
-    slug: cnn
--   urls:
-        - http://feeds.reuters.com/reuters/topNews
-    name: Reuters
-    slug: reut
--   urls:
-        - https://www.nhc.noaa.gov/index-at.xml
-    name: NOAA
-    slug: noaa
--   urls:
-        - http://feeds.bbci.co.uk/news/rss.xml
-    name: BBC-News
-    slug: bbc
+-   name: S-1 and S-4 Filings
+    match:
+        - 0000019617
+        - gs finance
+    exclude:
+        - '0000070502'
+    urls:
+        - https://secinternal.ipoinsider.com/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=424B&company=&dateb=&owner=include&start=0&count=40&output=atom
+        - https://secinternal.ipoinsider.com/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=424B3&company=&dateb=&owner=include&start=0&count=40&output=atom
+    slug: s1-s4

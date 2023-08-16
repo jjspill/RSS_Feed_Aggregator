@@ -1,6 +1,7 @@
 import helpers.cache_helpers.cacher as cacher
 from datetime import datetime
 import feedparser
+import logging
 
 
 def process_feed_metadata(feed, url):
@@ -69,19 +70,24 @@ def filter_feed_entries(
     """
     Filters feed entries based on provided keywords and stops processing once reaching last_seen_id
     """
-    print("==== Filtering feed entries")
+
+    logging.info("Filtering feed entries")
     entries = []
     for entry in feed.entries:
         if entry.get("id") and caching and entry["id"] == last_seen_id:
-            print("==== Reached last seen entry. Skipping older entries")
+            logging.info("Reached last seen entry. Skipping older entries")
             break
         if check_keywords(entry, match_keywords, exclude_keywords):
             entries.append(entry)
     return entries
 
 
-def process_feed_url(config, url, caching=False):
-    print(f"==== Fetching and parsing URL: {url}")
+def fetch_process_feed_url(config, url, caching=False):
+    """
+    Fetch and process url.
+    """
+
+    logging.info(f"Fetching and parsing URL: {url}")
     slug_url = config["slug"] + url
     # Attempt to get cache data if caching is enabled
     cache_data = cacher.fetch_cache(slug_url) if caching else None
@@ -92,12 +98,12 @@ def process_feed_url(config, url, caching=False):
     )
 
     if cache_data and caching:
-        print("==== Cached entry found")
+        logging.info("Cached entry found")
     elif not cache_data and caching:
-        print("==== No cached entry found")
+        logging.info("No cached entry found")
 
     try:
-        print("==== Initiating feed fetch and parse")
+        logging.info("Initiating feed fetch and parse")
 
         feed = feedparser.parse(
             url, etag=etag_value, modified=last_modified_value
@@ -105,11 +111,11 @@ def process_feed_url(config, url, caching=False):
 
         # Check for unmodified feed
         if caching and hasattr(feed, "status") and feed.status == 304:
-            print("==== Feed has not been modified since the last request")
+            logging.info("Feed has not been modified since the last request")
             return {}, [], None
 
         elif caching and cache_data:
-            print("==== Cannot determine if feed has been modified")
+            logging.info("Cannot determine if feed has been modified")
 
         # Check for feed type
         feed_type = "rss" if feed.version.startswith("rss") else "atom"
@@ -124,11 +130,12 @@ def process_feed_url(config, url, caching=False):
         feed_data = process_feed_metadata(feed, url)
 
         if config_filtered_entries:
-            print(
-                f"==== Found {len(config_filtered_entries)} new entries for URL: {url}"
+            logging.info(
+                f"Found {len(config_filtered_entries)} new {'entry' if len(config_filtered_entries) == 1 else 'entries'}"
             )
+
         else:
-            print(f"==== No new entries found for URL: {url}")
+            logging.info(f"No new entries found for URL: {url}")
 
         # Update cache if there's a change and if caching is enabled
         if caching:
@@ -146,14 +153,67 @@ def process_feed_url(config, url, caching=False):
             cacher.update_cache(
                 slug_url, new_last_seen_id, new_etag, new_last_modified
             )
-            print(f"==== Updated cache for {url}")
-
-        print(
-            f"==== Found {len(config_filtered_entries)} new entries for URL: {url}"
-        )
+            logging.info(f"Updated cache for {url}")
 
         return config_filtered_entries, feed_data, feed_type
 
     except Exception as e:
-        print(f"==== ERROR processing URL {url}: {e}")
+        logging.error(f"ERROR processing URL {url}: {e}")
+        return {}, []
+
+
+def only_process_feed(
+    response_status, config, url, feed_text, caching, cache_data
+):
+    """
+    Process already fetched url.
+    """
+    slug_url = config["slug"] + url
+    last_seen_id = cache_data[0] if cache_data else None
+
+    try:
+        feed = feedparser.parse(feed_text)
+
+        # Check for feed type
+        feed_type = "rss" if feed.version.startswith("rss") else "atom"
+
+        match_keywords = config.get("match", [])
+        exclude_keywords = config.get("exclude", [])
+
+        config_filtered_entries = filter_feed_entries(
+            feed, match_keywords, exclude_keywords, last_seen_id, caching
+        )
+
+        feed_data = process_feed_metadata(feed, url)
+
+        if config_filtered_entries:
+            logging.info(
+                f"Found {len(config_filtered_entries)} new {'entry' if len(config_filtered_entries) == 1 else 'entries'}"
+            )
+
+        else:
+            logging.info(f"No new entries found for URL: {url}")
+
+        # Update cache if there's a change and if caching is enabled
+        if caching:
+            if feed.entries[0].get("id"):
+                new_last_seen_id = (
+                    feed.entries[0]["id"] if feed.entries else None
+                )
+            else:
+                new_last_seen_id = (
+                    feed.entries[0]["link"] if feed.entries else None
+                )
+
+            new_etag = getattr(feed, "etag", None)
+            new_last_modified = getattr(feed, "modified", None)
+            cacher.update_cache(
+                slug_url, new_last_seen_id, new_etag, new_last_modified
+            )
+            logging.info(f"Updated cache for {url}")
+
+        return config_filtered_entries, feed_data, feed_type
+
+    except Exception as e:
+        logging.error(f"ERROR processing URL {url}: {e}")
         return {}, []

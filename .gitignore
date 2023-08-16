@@ -2,11 +2,11 @@
 *.flake8
 *.vscode
 .DS_Store
-output.txt
+*output.txt
 o.txt
 *.calltree
-profile_results.prof
 project/testing/*
 project/rss-feeds/testing/*
 project/helpers/cache_helpers/cache.db
 *xml
+*.prof

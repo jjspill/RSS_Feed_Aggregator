@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 from dateutil.parser import parse
 import xml.dom.minidom
+import logging
 import html
 import os
 import re
@@ -115,8 +116,8 @@ class FeedProcessorET(FeedProcessorBase):
 
             except Exception as e:
                 # Not necessary for entry to have published date
-                print(
-                    f"==== ERROR parsing published date: {e}, using current date"
+                logging.error(
+                    f"ERROR parsing published date: {e}, using current date"
                 )
                 published = datetime.now(timezone.utc).isoformat()
 
@@ -132,8 +133,8 @@ class FeedProcessorET(FeedProcessorBase):
                 updated = parsed_date.replace(tzinfo=timezone.utc).isoformat()
 
             except Exception as e:
-                print(
-                    f"==== ERROR parsing updated date: {e}, using current date"
+                logging.error(
+                    f"ERROR parsing updated date: {e}, using current date"
                 )
                 updated = datetime.now(timezone.utc).isoformat()
 
@@ -283,20 +284,20 @@ class FeedProcessorET(FeedProcessorBase):
 
                 old_tree = ET.fromstring(content)
 
-                print("==== Merging with existing file")
+                logging.info("Merging with existing file")
 
                 for entry in old_tree.findall("entry"):
                     new_root.append(entry)
 
                 self.root = new_root
 
-            except ET.ParseError:
-                print(
+            except ET.ParseERROR:
+                logging.error(
                     f"The file {self.output_file} could not be parsed and will be overwritten."
                 )
 
             except Exception as e:
-                print(f"==== ERROR: {e}")
+                logging.error(f"ERROR: {e}")
 
     def get_xml(self):
         return self.prettify_xml()
@@ -339,24 +340,24 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_title(self):
         title = self.entry.get("title")
         if title:
-            self.xml_strings.append(f"  <title>{html.escape(title)}</title>")
+            self.xml_strings.append(f" <title>{html.escape(title)}</title>")
 
     def process_published(self):
         published = self.entry.get("published")
         if published and self.feed_atom:
-            self.xml_strings.append(f"  <published>{published}</published>")
+            self.xml_strings.append(f" <published>{published}</published>")
         elif published:
-            self.xml_strings.append(f"  <pubDate>{published}</pubDate>")
+            self.xml_strings.append(f" <pubDate>{published}</pubDate>")
 
     def process_updated(self):
         updated = self.entry.get("updated")
         if updated and self.feed_atom:
-            self.xml_strings.append(f"  <updated>{updated}</updated>")
+            self.xml_strings.append(f" <updated>{updated}</updated>")
 
     def process_id(self):
         id_value = self.entry.get("id")
         if id_value and self.feed_atom:
-            self.xml_strings.append(f"  <id>{id_value}</id>")
+            self.xml_strings.append(f" <id>{id_value}</id>")
         elif id_value:
             guidislink = self.entry.get("guidislink", False)
             self.xml_strings.append(
@@ -382,7 +383,7 @@ class FeedProcessorSTR(FeedProcessorBase):
             )
         elif summary:
             self.xml_strings.append(
-                f"  <description>{html.escape(summary)}</description>"
+                f" <description>{html.escape(summary)}</description>"
             )
 
     def process_enclosures(self):
@@ -417,7 +418,7 @@ class FeedProcessorSTR(FeedProcessorBase):
                     f'  <category domain="{scheme}">{term}</category>'
                 )
             else:
-                self.xml_strings.append(f"  <category>{term}</category>")
+                self.xml_strings.append(f" <category>{term}</category>")
 
     def process_links(self):
         for link in self.entry.get("links", []):
@@ -440,9 +441,7 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_author(self):
         author = self.entry.get("author")
         if author:
-            self.xml_strings.append(
-                f"  <author><name>{author}</name></author>"
-            )
+            self.xml_strings.append(f" <author><name>{author}</name></author>")
 
     def get_xml(self):
         return "\n".join(self.xml_strings) + "\n\n"

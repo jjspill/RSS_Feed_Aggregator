@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,12 +25,12 @@ def setup_database():
             # Table setup
             try:
                 cursor.execute(CREATE_TABLE_SQL)
-            except sqlite3.Error as e:
-                print(f"ERROR: {e}")
+            except sqlite3.ERROR as e:
+                logging.error(f"ERROR: {e}")
 
-            print("==== Database set up complete")
+            logging.info("Database set up complete")
     else:
-        print("==== Database exists")
+        logging.info("Database exists")
 
 
 def update_cache(url, last_seen_id, etag=None, last_modified=None):

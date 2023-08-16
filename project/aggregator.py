@@ -1,6 +1,7 @@
-import helpers.input_helpers.yaml_writer as generator
-import helpers.output_helpers.yaml_parser as aggregator
+import helpers.yaml_helpers.yaml_writer as generator
+import helpers.yaml_helpers.yaml_processor as aggregator
 import argparse
+import logging
 
 
 def run_(
@@ -14,12 +15,16 @@ def run_(
         generator.generate_yaml()
 
     if multiprocessing and parsing:
-        aggregator.process_yaml_multiprocessing(cache, entries_only, filepath)
+        aggregator.process_yaml_concurrency(cache, entries_only, filepath)
     elif parsing:
         aggregator.process_yaml(cache, entries_only, filepath)
 
 
 def cli_main():
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
     parser = argparse.ArgumentParser(description="RSS Feed Aggregator")
     parser.add_argument(
         "-c",
