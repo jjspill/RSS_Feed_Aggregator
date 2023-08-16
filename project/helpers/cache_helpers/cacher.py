@@ -25,15 +25,15 @@ def setup_database():
             # Table setup
             try:
                 cursor.execute(CREATE_TABLE_SQL)
-            except sqlite3.ERROR as e:
-                logging.error(f"ERROR: {e}")
+            except sqlite3.error as e:
+                logging.error(f"Error: {e}")
 
             logging.info("Database set up complete")
     else:
         logging.info("Database exists")
 
 
-def update_cache(url, last_seen_id, etag=None, last_modified=None):
+def update_cache(slug_url, last_seen_id, etag=None, last_modified=None):
     # Connect to database
     with sqlite3.connect(DATABASE_FILEPATH) as conn:
         cursor = conn.cursor()
@@ -44,7 +44,7 @@ def update_cache(url, last_seen_id, etag=None, last_modified=None):
             INSERT OR REPLACE INTO cache (slug_url, last_seen_id, etag, last_modified)
             VALUES (?, ?, ?, ?)
             """,
-            (url, last_seen_id, etag, last_modified),
+            (slug_url, last_seen_id, etag, last_modified),
         )
 
 

@@ -10,3 +10,4 @@ project/rss-feeds/testing/*
 project/helpers/cache_helpers/cache.db
 *xml
 *.prof
+*.log

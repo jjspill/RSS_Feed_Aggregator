@@ -1,30 +1,43 @@
 import helpers.yaml_helpers.yaml_writer as generator
 import helpers.yaml_helpers.yaml_processor as aggregator
+import helpers.cache_helpers.cacher as cacher
 import argparse
 import logging
 
 
 def run_(
-    cache=False,
+    caching=False,
     entries_only=True,
     multiprocessing=True,
     parsing=True,
     filepath=None,
 ):
+    logging.basicConfig(
+        filename="main_log.log",
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+
+    logging.info("Starting RSS Feed Aggregator")
+    logging.info("")
+
+    cacher.setup_database()
+
     if not filepath:
         generator.generate_yaml()
 
     if multiprocessing and parsing:
-        aggregator.process_yaml_concurrency(cache, entries_only, filepath)
+        aggregator.process_yaml_concurrency(caching, entries_only, filepath)
     elif parsing:
-        aggregator.process_yaml(cache, entries_only, filepath)
+        aggregator.process_yaml(caching, entries_only, filepath)
+
+    logging.info("")
+    logging.info("Finished RSS Feed Aggregator")
+    logging.info("")
+    logging.info("")
 
 
 def cli_main():
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
-
     parser = argparse.ArgumentParser(description="RSS Feed Aggregator")
     parser.add_argument(
         "-c",

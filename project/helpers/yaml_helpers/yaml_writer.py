@@ -1,3 +1,4 @@
+import helpers.cache_helpers.cacher as cacher
 from pyairtable import Api
 import logging
 import yaml
@@ -16,6 +17,19 @@ class MyDumper(yaml.Dumper):
         return super(MyDumper, self).increase_indent(flow, False)
 
 
+def fetch_last_modified(table):
+    """
+    Fetch last modified timestamp from Airtable.
+    """
+    records = table.all(
+        sort=[{"field": "Last Modified", "direction": "desc"}], page_size=1
+    )
+
+    if records:
+        return records[0]["fields"].get("Last Modified")
+    return None
+
+
 def get_airtable_config():
     """
     Read JSON file and return data.
@@ -26,7 +40,7 @@ def get_airtable_config():
             return json.load(f)
 
     except Exception as e:
-        logging.error(f"ERROR reading JSON file: {e}")
+        logging.error(f"Error reading JSON file: {e}")
         return None
 
 
@@ -39,7 +53,7 @@ def auth(airtable_data):
         return Api(airtable_data["AIRTABLE_API_KEY"])
 
     except Exception as e:
-        logging.error(f"ERROR authenticating with Airtable: {e}")
+        logging.error(f"Error authenticating with Airtable: {e}")
         return None
 
 
@@ -53,11 +67,28 @@ def fetch_table_data(api, airtable_data, fields):
             airtable_data["AIRTABLE_BASE_ID"],
             airtable_data["AIRTABLE_TABLE_NAME"],
         )
-        return [record["fields"] for record in table.all(fields=fields)]
+
+        # Fetch last modified timestamp from Airtable
+        """
+        current_timestamp = fetch_last_modified(table)
+        _, _, cached_timestamp = cacher.fetch_cache("airtable_last_modified")
+
+        if cached_timestamp and current_timestamp == cached_timestamp:
+            logging.info("No new data found in Airtable, using same YAML")
+            return None, "no_new_data"
+
+        cacher.update_cache(
+            "airtable_last_modified", None, None, current_timestamp
+        )
+        """
+
+        return [
+            record["fields"] for record in table.all(fields=fields)
+        ], "success"
 
     except Exception as e:
-        logging.error(f"ERROR fetching table data from Airtable: {e}")
-        return None
+        logging.error(f"Error fetching table data from Airtable: {e}")
+        return None, "error"
 
 
 def process_table_data(data):
@@ -73,7 +104,7 @@ def process_table_data(data):
         return data
 
     except Exception as e:
-        logging.error(f"ERROR processing table data: {e}")
+        logging.error(f"Error processing table data: {e}")
         return None
 
 
@@ -89,7 +120,7 @@ def validate(data):
         if all(key in d for key in required_fields):
             filtered_data.append(d)
         else:
-            logging.info(f"Record does not have all required fields: {d}")
+            logging.error(f"Record does not have all required fields: {d}")
 
     return filtered_data  # move to bottom if uncommenting below
 
@@ -103,11 +134,11 @@ def validate(data):
                 response = requests.get(url, timeout=5)
                 if not (200 <= response.status_code < 300):
                     print(
-                        f"ERROR validating URL {url}: {response.status_code}"
+                        f"Error validating URL {url}: {response.status_code}"
                     )
                     urls_to_remove.append(url)
             except Exception as e:
-                logging.error(f"ERROR validating URL {url}: {e}")
+                logging.error(f"Error validating URL {url}: {e}")
                 urls_to_remove.append(url)
 
         # Remove problematic URLs
@@ -139,15 +170,23 @@ def generate_yaml():
     TABLE_FIELDS = ["name", "slug", "urls", "match", "exclude"]
 
     # Fetch data from Airtable
+    table_data, status = fetch_table_data(api, airtable_data, TABLE_FIELDS)
+
+    if status == "no_new_data":
+        logging.info("Airtable data has not changed. Using same YAML.")
+        return
+
+    elif not table_data or status != "success":
+        logging.info(
+            "No data found in Airtable or an error occurred. Exiting."
+        )
+        exit(1)
+
     processed_data = [
         processed
-        for data in fetch_table_data(api, airtable_data, TABLE_FIELDS)
+        for data in table_data
         if (processed := process_table_data(data)) is not None
     ]
-
-    if not processed_data:
-        logging.info("No data found in Airtable. Exiting")
-        exit(1)
 
     # Validate data
     processed_data = validate(processed_data)

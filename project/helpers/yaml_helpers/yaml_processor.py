@@ -1,4 +1,3 @@
-import helpers.cache_helpers.cacher as cacher
 import helpers.feed_helpers.feed_writer as writer
 import helpers.feed_helpers.feed_parser as parser
 import helpers.yaml_helpers.concurrency_helper as concurrency
@@ -18,13 +17,13 @@ def load_yaml_config(filepath=None):
         with open(filepath, "r") as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
-        logging.error(f"ERROR: File '{filepath}' not found.")
+        logging.error(f"Error: File '{filepath}' not found.")
     except PermissionError:
         logging.error(
-            f"ERROR: Permission denied when trying to read '{filepath}'."
+            f"Error: Permission denied when trying to read '{filepath}'."
         )
-    except yaml.YAMLERROR as exc:
-        logging.error(f"ERROR parsing YAML from '{filepath}': {exc}")
+    except yaml.YAMLError as exc:
+        logging.error(f"Error parsing YAML from '{filepath}': {exc}")
     exit(1)
 
 
@@ -34,8 +33,6 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
     """
     logging.info("Starting to process configurations")
     logging.info("")
-    if caching:
-        cacher.setup_database()
 
     yaml_config = load_yaml_config(filepath)
 
@@ -84,9 +81,6 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
 
 def process_yaml_concurrency(caching=False, entries_only=False, filepath=None):
     logging.info("Processing configurations with concurrency")
-
-    if caching:
-        cacher.setup_database()
 
     yaml_config = load_yaml_config(filepath)
 

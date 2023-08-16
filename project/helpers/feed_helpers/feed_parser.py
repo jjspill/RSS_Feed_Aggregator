@@ -158,7 +158,7 @@ def fetch_process_feed_url(config, url, caching=False):
         return config_filtered_entries, feed_data, feed_type
 
     except Exception as e:
-        logging.error(f"ERROR processing URL {url}: {e}")
+        logging.error(f"Error processing URL {url}: {e}")
         return {}, []
 
 
@@ -215,5 +215,5 @@ def only_process_feed(
         return config_filtered_entries, feed_data, feed_type
 
     except Exception as e:
-        logging.error(f"ERROR processing URL {url}: {e}")
+        logging.error(f"Error processing URL {url}: {e}")
         return {}, []

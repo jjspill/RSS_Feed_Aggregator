@@ -44,9 +44,9 @@ def parse(args):
         return (args[1], result_dict)
 
     except Exception as e:
-        logging.error(f"ERROR processing URL: {url}")
+        logging.error(f"Error processing URL: {url}")
         logging.info(f"slug: {config['slug']}")
-        logging.error(f"ERROR: {e}")
+        logging.error(f"Error: {e}")
         logging.info("")
 
 
@@ -113,7 +113,7 @@ async def fetch_url(config, url, caching=False):
                     )
                     return None
                 elif response.status == 404:
-                    logging.error(f"ERROR: URL {url} not found.")
+                    logging.error(f"Error: URL {url} not found.")
                     return None
                 elif caching and not cache_data:
                     logging.info("No cached entry found for:", url)
@@ -127,8 +127,8 @@ async def fetch_url(config, url, caching=False):
                     cache_data,
                 )
 
-    except aiohttp.ClientERROR as e:
-        logging.error(f"ERROR fetching {url}: {str(e)}")
+    except aiohttp.ClientError as e:
+        logging.error(f"Error fetching {url}: {str(e)}")
         return None
 
 

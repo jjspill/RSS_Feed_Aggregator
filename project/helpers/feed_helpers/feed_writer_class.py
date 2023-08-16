@@ -117,7 +117,7 @@ class FeedProcessorET(FeedProcessorBase):
             except Exception as e:
                 # Not necessary for entry to have published date
                 logging.error(
-                    f"ERROR parsing published date: {e}, using current date"
+                    f"Error parsing published date: {e}, using current date"
                 )
                 published = datetime.now(timezone.utc).isoformat()
 
@@ -134,7 +134,7 @@ class FeedProcessorET(FeedProcessorBase):
 
             except Exception as e:
                 logging.error(
-                    f"ERROR parsing updated date: {e}, using current date"
+                    f"Error parsing updated date: {e}, using current date"
                 )
                 updated = datetime.now(timezone.utc).isoformat()
 
@@ -291,13 +291,13 @@ class FeedProcessorET(FeedProcessorBase):
 
                 self.root = new_root
 
-            except ET.ParseERROR:
+            except ET.ParseError:
                 logging.error(
                     f"The file {self.output_file} could not be parsed and will be overwritten."
                 )
 
             except Exception as e:
-                logging.error(f"ERROR: {e}")
+                logging.error(f"Error: {e}")
 
     def get_xml(self):
         return self.prettify_xml()
