@@ -6,7 +6,7 @@
 o.txt
 *.calltree
 project/testing/*
-project/rss-feeds/testing/*
+project/rss_feeds/testing/*
 project/helpers/cache_helpers/cache.db
 *xml
 *.prof
