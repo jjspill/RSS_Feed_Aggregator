@@ -26,7 +26,7 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```
 
 5. **Add Airtable Configuration File:**  
-    Create a new file in the `project/airtable-config` directory and name it `airtable_config.json`.
+    Create a new file in the `project/airtable_config` directory and name it `airtable_config.json`.
     Open the new file in a text editor.
     Add the following lines to the file, replacing `<...>` with your actual values:
     ```json
@@ -55,18 +55,17 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```
     Default mode means that the Aggregator will output entries only and will use concurrency to fetch, parse, and write to files.
 
-4. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**  
+4. **The results will be saved in the `RSS_Feed_Aggregator/project/rss-feeds` directory as XML files, categorized by their respective slugs**  
 
-5. **Logs are written to `main_log.log`**
+5. **Logs are written to `RSS_Feed_Aggregator/main_log.log`**
 
 6. **Other Flags**
 - Use `--cache` or `-c` to enable caching of past URLs.
 - Use `--valid_rss` or `-v` to output a valid atom feed.
-- Use `--no_concurrency` or `-nc` to disable concurrency.
 - Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML.
-- Use `--yaml` or `-y` to disable YAML creation and use an already created configuration YAML.
+- Use `--yaml <filepath>` or `-y <filepath>` to disable YAML creation and use an already created configuration YAML.
 
 ## Notes
-- **valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.**
+- valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.
 - **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if valid_rss is enabled.**
-- **The Aggregator and cache will work with any flags just keep in mind changing the cache or valid_rss flags in between consecutive runs will cause problems with how the cached feeds / entries are merged with the new ones.**
+- **The Aggregator and cache will work with any flags just keep in mind changing the cache or valid_rss flags in between consecutive runs will cause problems with how the cached feeds / entries are merged with the new ones. If this problem occurs, delete the cache.db file in the cache_helpers directory.**
