@@ -2,48 +2,96 @@
         - https://www.npr.org/rss/podcast.php?id=13
     name: Fresh-Air
     slug: npr-fa
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - https://feeds.feedburner.com/TechCrunch/
     name: TechCrunch
     slug: tc
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://feeds.arstechnica.com/arstechnica/index/
     name: Ars Technica
     slug: ars
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://www.nasa.gov/rss/dyn/breaking_news.rss
     name: Nasa
     slug: nasa
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://feeds.feedburner.com/typepad/sethsmainblog
     name: Seth Godin
     slug: seth
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
     name: NYT-News
     slug: nyt
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeEFtRWA==
         - https://feed.businesswire.com/rss/home/?rss=G1QFDERJXkJeGFNTXg==
     name: BusinessWire
     slug: businesswire
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - https://www.wired.com/feed/rss
     name: wired
     slug: wired
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://rss.cnn.com/rss/cnn_topstories.rss
     name: CNN-News
     slug: cnn
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://feeds.reuters.com/reuters/topNews
     name: Reuters
     slug: reut
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - https://www.nhc.noaa.gov/index-at.xml
     name: NOAA
     slug: noaa
+    match:
+        - good
+    exclude:
+        - bad
 -   urls:
         - http://feeds.bbci.co.uk/news/rss.xml
     name: BBC-News
     slug: bbc
+    match:
+        - good
+    exclude:
+        - bad

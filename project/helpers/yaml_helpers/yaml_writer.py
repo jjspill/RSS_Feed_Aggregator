@@ -1,4 +1,3 @@
-import helpers.cache_helpers.cacher as cacher
 from pyairtable import Api
 import logging
 import yaml
