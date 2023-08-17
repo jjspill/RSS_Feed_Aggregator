@@ -55,9 +55,11 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```
     Default mode means that the Aggregator will output entries only and will use concurrency to fetch, parse, and write to files.
 
-4. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**
+4. **The results will be saved in the `project/rss-feeds` directory as XML files, categorized by their respective slugs**  
 
-5. **Other Flags**
+5. **Logs are written to `main_log.log`**
+
+6. **Other Flags**
 - Use `--cache` or `-c` to enable caching of past URLs.
 - Use `--valid_rss` or `-v` to output a valid atom feed.
 - Use `--no_concurrency` or `-nc` to disable concurrency.

@@ -212,6 +212,7 @@ class FeedProcessorET(FeedProcessorBase):
         """
         Checks if the atom_id is a valid URI or URN.
         """
+
         uri_pattern = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*://.*$")
         urn_pattern = re.compile(r"^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:.*$")
 
@@ -224,6 +225,7 @@ class FeedProcessorET(FeedProcessorBase):
         """
         Checks if the date_str is a valid RFC-3339 date-time string.
         """
+
         try:
             datetime.fromisoformat(date_str)
             return True
@@ -234,6 +236,7 @@ class FeedProcessorET(FeedProcessorBase):
         """
         Attempts to parse the time_string with timezone info.
         """
+
         tzinfos = {"UT": 0}
         return parse(time_string, tzinfos=tzinfos)
 
@@ -241,6 +244,7 @@ class FeedProcessorET(FeedProcessorBase):
         """
         Remove attributes with value None.
         """
+
         if element.text:
             element.text = element.text.strip()
 
@@ -262,6 +266,7 @@ class FeedProcessorET(FeedProcessorBase):
         """
         Prettify XML using minidom.
         """
+
         self.root = self.clean_xml(self.root)
 
         encoding = self.feed_data.get("encoding", "utf-8")

@@ -4,8 +4,6 @@ import yaml
 import json
 import os
 
-# import requests
-
 
 class MyDumper(yaml.Dumper):
     """
@@ -16,26 +14,14 @@ class MyDumper(yaml.Dumper):
         return super(MyDumper, self).increase_indent(flow, False)
 
 
-def fetch_last_modified(table):
-    """
-    Fetch last modified timestamp from Airtable.
-    """
-    records = table.all(
-        sort=[{"field": "Last Modified", "direction": "desc"}], page_size=1
-    )
-
-    if records:
-        return records[0]["fields"].get("Last Modified")
-    return None
-
-
 def get_airtable_config():
     """
     Read JSON file and return data.
     """
+
     try:
         logging.info("Reading Airtable config file")
-        with open("airtable-config/airtable_config.json", "r") as f:
+        with open("airtable_config/airtable_config.json", "r") as f:
             return json.load(f)
 
     except Exception as e:
@@ -47,6 +33,7 @@ def auth(airtable_data):
     """
     Authenticate and return API instance for Airtable.
     """
+
     try:
         logging.info("Authenticating with Airtable")
         return Api(airtable_data["AIRTABLE_API_KEY"])
@@ -60,40 +47,25 @@ def fetch_table_data(api, airtable_data, fields):
     """
     Fetch specified fields from Airtable table.
     """
+
     try:
         logging.info("Fetching table data from Airtable")
         table = api.table(
             airtable_data["AIRTABLE_BASE_ID"],
             airtable_data["AIRTABLE_TABLE_NAME"],
         )
-
-        # Fetch last modified timestamp from Airtable
-        """
-        current_timestamp = fetch_last_modified(table)
-        _, _, cached_timestamp = cacher.fetch_cache("airtable_last_modified")
-
-        if cached_timestamp and current_timestamp == cached_timestamp:
-            logging.info("No new data found in Airtable, using same YAML")
-            return None, "no_new_data"
-
-        cacher.update_cache(
-            "airtable_last_modified", None, None, current_timestamp
-        )
-        """
-
-        return [
-            record["fields"] for record in table.all(fields=fields)
-        ], "success"
+        return [record["fields"] for record in table.all(fields=fields)]
 
     except Exception as e:
         logging.error(f"Error fetching table data from Airtable: {e}")
-        return None, "error"
+        return None
 
 
 def process_table_data(data):
     """
     Strip whitespace from list items in table data.
     """
+
     try:
         if not data:
             return None
@@ -111,6 +83,7 @@ def validate(data):
     """
     Validate data from Airtable.
     """
+
     required_fields = ["name", "slug", "urls"]
     filtered_data = []
 
@@ -121,37 +94,7 @@ def validate(data):
         else:
             logging.error(f"Record does not have all required fields: {d}")
 
-    return filtered_data  # move to bottom if uncommenting below
-
-    # Validate URLs
-    # Commenting because bad URLs are checked after feed is parsed
-    """
-    for d in filtered_data:
-        urls_to_remove = []
-        for url in d["urls"]:
-            try:
-                response = requests.get(url, timeout=5)
-                if not (200 <= response.status_code < 300):
-                    print(
-                        f"Error validating URL {url}: {response.status_code}"
-                    )
-                    urls_to_remove.append(url)
-            except Exception as e:
-                logging.error(f"Error validating URL {url}: {e}")
-                urls_to_remove.append(url)
-
-        # Remove problematic URLs
-        for url in urls_to_remove:
-            logging.info(f"Removing URL {url} from record {d['name']}")
-            d["urls"].remove(url)
-
-        # Remove records that have no valid URLs
-        if not d["urls"]:
-            print(
-                f"Removing record {d['name']} because it has no valid URLs"
-            )
-            filtered_data.remove(d)
-    """
+    return filtered_data
 
 
 def generate_yaml():
@@ -169,16 +112,10 @@ def generate_yaml():
     TABLE_FIELDS = ["name", "slug", "urls", "match", "exclude"]
 
     # Fetch data from Airtable
-    table_data, status = fetch_table_data(api, airtable_data, TABLE_FIELDS)
+    table_data = fetch_table_data(api, airtable_data, TABLE_FIELDS)
 
-    if status == "no_new_data":
-        logging.info("Airtable data has not changed. Using same YAML.")
-        return
-
-    elif not table_data or status != "success":
-        logging.info(
-            "No data found in Airtable or an error occurred. Exiting."
-        )
+    if not table_data:
+        logging.info("No data found in Airtable or an error occurred, exiting")
         exit(1)
 
     processed_data = [
@@ -194,10 +131,10 @@ def generate_yaml():
     logging.info("")
     # Save data as YAML file
 
-    if not os.path.exists("yaml-config"):
-        os.makedirs("yaml-config")
+    if not os.path.exists("yaml_config"):
+        os.makedirs("yaml_config")
 
-    with open("yaml-config/rss_config.yaml", "w") as f:
+    with open("yaml_config/rss_config.yaml", "w") as f:
         f.write(
             yaml.dump(
                 processed_data,

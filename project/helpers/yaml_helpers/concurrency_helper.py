@@ -1,53 +1,8 @@
-import helpers.feed_helpers.feed_parser as parser
 import helpers.cache_helpers.cacher as cacher
 import logging.handlers
 import logging
 import aiohttp
 import asyncio
-
-
-def parse(args):
-    """
-    Parse a URL.
-    """
-    log_queue = args[0]
-
-    (
-        response_status,
-        config,
-        url,
-        feed_text,
-        caching,
-        cache_data,
-    ) = args[1]
-
-    worker_configurer(log_queue)
-    logging.info(f"Parsing slug: {config['slug']}, URL: {url}")
-
-    try:
-        result = parser.only_process_feed(
-            response_status, config, url, feed_text, caching, cache_data
-        )
-
-        if not result[0]:
-            return None
-
-        result_dict = {
-            "filtered_entries": result[0],
-            "feed_data": result[1],
-            "feed_type": result[2],
-        }
-
-        logging.info(f"Finished parsing URL: {url}")
-        logging.info("")
-
-        return (args[1], result_dict)
-
-    except Exception as e:
-        logging.error(f"Error processing URL: {url}")
-        logging.info(f"slug: {config['slug']}")
-        logging.error(f"Error: {e}")
-        logging.info("")
 
 
 def reorganize_results(results):
@@ -62,8 +17,12 @@ def reorganize_results(results):
             continue
 
         args, result_dict = result
-        config = args[1]
+        config = args
         slug = config["slug"]
+
+        if not result_dict:
+            logging.error(f"Error processing {slug}")
+            continue
 
         if slug not in reorganized_results:
             reorganized_results[slug] = {
@@ -84,6 +43,7 @@ async def fetch_url(config, url, caching=False):
     """
     Fetch URL and return status code and data.
     """
+
     logging.info(f"Fetching URL: {url}")
     slug_url = config["slug"] + url
     cache_data = cacher.fetch_cache(slug_url) if caching else None
@@ -136,6 +96,7 @@ async def fetch_all_urls(yaml_config, caching=False):
     """
     Fetch all URLs with async.
     """
+
     tasks = [
         fetch_url(config, url, caching)
         for config in yaml_config
@@ -147,6 +108,7 @@ async def fetch_all_urls(yaml_config, caching=False):
     results = await asyncio.gather(*tasks)
     logging.info("")
     logging.info("Finished fetching all URLs")
+    logging.info("")
     return [result for result in results if result is not None]
 
 
@@ -154,41 +116,5 @@ def async_run(yaml_config, caching=False):
     """
     Run async fetch for all URLs.
     """
+
     return asyncio.run(fetch_all_urls(yaml_config, caching))
-
-
-def listener_configurer():
-    """
-    Configure logging for listener process.
-    """
-    root = logging.getLogger()
-    h = logging.StreamHandler()
-    f = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    h.setFormatter(f)
-    root.addHandler(h)
-
-
-def listener_process(queue):
-    """
-    Process logs from queue.
-    """
-    listener_configurer()
-    while True:
-        try:
-            record = queue.get()
-            if record is None:
-                break
-            logger = logging.getLogger(record.name)
-            logger.handle(record)
-        except Exception:
-            pass
-
-
-def worker_configurer(queue):
-    """
-    Configure logging for worker process.
-    """
-    h = logging.handlers.QueueHandler(queue)
-    root = logging.getLogger()
-    root.addHandler(h)
-    root.setLevel(logging.INFO)

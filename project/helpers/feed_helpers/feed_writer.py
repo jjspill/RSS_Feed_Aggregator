@@ -9,14 +9,15 @@ def output_feed(args_list):
     """
     Output XML feeds to respective files.
     """
+
     slug, entries, feed_data, feed_type, caching, entries_only = args_list
     if not entries or not feed_data:
         return None
 
-    if not os.path.exists("rss-feeds"):
-        os.makedirs("rss-feeds")
+    if not os.path.exists("rss_feeds"):
+        os.makedirs("rss_feeds")
 
-    output_file = f"rss-feeds/{slug}-feed.xml"
+    output_file = f"rss_feeds/{slug}_feed.xml"
 
     xml_output = ""
     if entries_only:
