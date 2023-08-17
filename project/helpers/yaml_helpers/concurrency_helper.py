@@ -11,13 +11,14 @@ def reorganize_results(results):
     """
 
     reorganized_results = {}
+    total_num_entries = 0
 
+    # result = (config, result_dict)
     for result in results:
         if not result:
             continue
 
-        args, result_dict = result
-        config = args
+        (config, result_dict, num_entries_parsed) = result
         slug = config["slug"]
 
         if not result_dict:
@@ -36,7 +37,9 @@ def reorganize_results(results):
             result_dict["filtered_entries"]
         )
 
-    return reorganized_results.values()
+        total_num_entries += num_entries_parsed
+
+    return reorganized_results.values(), total_num_entries
 
 
 async def fetch_url(config, url, caching=False):
@@ -75,8 +78,6 @@ async def fetch_url(config, url, caching=False):
                 elif response.status == 404:
                     logging.error(f"Error: URL {url} not found.")
                     return None
-                elif caching and not cache_data:
-                    logging.info("No cached entry found for:", url)
                 data = await response.text()
                 return (
                     response.status,

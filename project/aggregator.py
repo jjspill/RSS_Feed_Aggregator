@@ -3,6 +3,7 @@ import helpers.yaml_helpers.yaml_processor as aggregator
 import helpers.cache_helpers.cacher as cacher
 import argparse
 import logging
+import time
 
 
 def run_(
@@ -14,6 +15,7 @@ def run_(
     """
     Run the RSS Feed Aggregator.
     """
+    start_time = time.time()
 
     logging.basicConfig(
         filename="main_log.log",
@@ -33,6 +35,9 @@ def run_(
 
     if parsing:
         aggregator.process_yaml(caching, entries_only, filepath)
+    endtime = time.time()
+    duration = endtime - start_time
+    logging.info(f"Duration of run: {duration: .2f} seconds")
 
     logging.info("")
     logging.info("Finished RSS Feed Aggregator")

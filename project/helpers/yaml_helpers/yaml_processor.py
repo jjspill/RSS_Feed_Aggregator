@@ -41,6 +41,7 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
     yaml_config = load_yaml_config(filepath)
 
     aggregated_results = []
+    multi_results = []
 
     # (response status, config, url, response data, caching, cache_data)
     async_results = concurrency.async_run(yaml_config, caching)
@@ -52,18 +53,25 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
             parser.FeedProcessor.process_feed_wrapper, async_results
         )
 
-        logging.info("Finished parsing all configurations")
-        logging.info("")
+    logging.info("Finished parsing all configurations")
+    logging.info("")
 
-        aggregated_results = concurrency.reorganize_results(multi_results)
+    aggregated_results, total_num_entries = concurrency.reorganize_results(
+        multi_results
+    )
 
     # Write to XML files
     writer_args_list = []
+    total_entries_found = 0
+
     for result in aggregated_results:
         if result["aggregated_entries"]:
             logging.info(
                 f'Found: {str(len(result["aggregated_entries"])).ljust(3)} entries for {result["slug"]}'
             )
+
+            total_entries_found += len(result["aggregated_entries"])
+
             result_List = [
                 result["slug"],
                 result["aggregated_entries"],
@@ -79,6 +87,7 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
 
     logging.info("")
     logging.info("Writing to XML files")
+
     with Pool() as pool:
         pool.map(writer.output_feed, writer_args_list)
 
@@ -86,3 +95,8 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
 
     logging.info("")
     logging.info("Finished processing all configurations")
+    logging.info("")
+
+    logging.info("Summary:")
+    logging.info(f"Total entries parsed: {total_num_entries}")
+    logging.info(f"Total entries found: {total_entries_found}")

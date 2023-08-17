@@ -91,15 +91,17 @@ class FeedProcessor:
         exclude_keywords = self.config.get("exclude", [])
 
         last_id = self.cache_data[0] if self.cache_data else None
+        num_entries_parsed = 0
 
         for entry in feed.entries:
+            num_entries_parsed += 1
             if entry.get("id") and self.caching and entry["id"] == last_id:
                 break
             if FeedProcessor.check_keywords(
                 entry, match_keywords, exclude_keywords
             ):
                 entries.append(entry)
-        return entries
+        return entries, num_entries_parsed
 
     def process_feed(self):
         """
@@ -113,16 +115,20 @@ class FeedProcessor:
 
             feed_type = "rss" if feed.version.startswith("rss") else "atom"
 
-            config_filtered_entries = self.filter_feed_entries(feed)
+            (
+                config_filtered_entries,
+                total_num_entries,
+            ) = self.filter_feed_entries(feed)
 
             feed_data = self.process_feed_metadata(feed)
 
-            if self.caching:
+            if feed.entries and self.caching:
+                new_last_seen_id = None
                 if feed.entries[0].get("id"):
                     new_last_seen_id = (
                         feed.entries[0]["id"] if feed.entries else None
                     )
-                else:
+                elif feed.entries[0].get("link"):
                     new_last_seen_id = (
                         feed.entries[0]["link"] if feed.entries else None
                     )
@@ -139,9 +145,9 @@ class FeedProcessor:
                 "feed_type": feed_type,
             }
 
-            return (self.config, result_dict)
+            return (self.config, result_dict, total_num_entries)
 
         except Exception as e:
             print(f"Error: {e}")
             print("")
-            return (self.config, None)
+            return (self.config, None, None)
