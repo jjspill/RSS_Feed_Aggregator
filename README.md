@@ -67,5 +67,15 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 
 ## Notes
 - valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.
-- **The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if valid_rss is enabled.**
-- **The Aggregator and cache will work with any flags just keep in mind changing the cache or valid_rss flags in between consecutive runs will cause problems with how the cached feeds / entries are merged with the new ones. If this problem occurs, delete the cache.db file in the cache_helpers directory.**
+- The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if valid_rss is enabled.
+- The Aggregator and cache will work with any flags just keep in mind changing the cache or valid_rss flags in between consecutive runs will cause problems with how the cached feeds / entries are merged with the new ones. If this problem occurs, delete the cache.db file in the cache_helpers directory.
+
+## File Explanations
+- aggregator.py: Serves as the main entry point, managing the command-line interface and overall orchestration.
+- yaml_writer.py: Interfaces with Airtable, and exports data to a YAML format located at `project/yaml_config/`.
+- yaml_processor.py: Interprets and processes configurations from the YAML file, delegating tasks to other modules as needed.
+- concurrency_helper.py: Provides utilities to streamline asynchronous tasks and manage multiprocessing for enhanced performance.
+- feed_parser_class.py: Handles the parsing of each URL and collects all relevant entries.
+- feed_writer_class.py: Dictates the format and structure of each entry, item, (or feed if --valid_rss is activated).
+- feed_writer.py: Finalizes and writes processed data to designated output files.
+- cacher.py: Administers the caching mechanisms.
