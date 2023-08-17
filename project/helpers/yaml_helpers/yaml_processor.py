@@ -62,7 +62,7 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
     for result in aggregated_results:
         if result["aggregated_entries"]:
             logging.info(
-                f'FOUND a total of {len(result["aggregated_entries"])} new entries for {result["slug"]}'
+                f'Found: {str(len(result["aggregated_entries"])).ljust(3)} entries for {result["slug"]}'
             )
             result_List = [
                 result["slug"],
@@ -75,7 +75,7 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
             writer_args_list.append(result_List)
 
         else:
-            logging.info(f"No new entries found for {result['slug']}")
+            logging.info(f'Found: 0   entries for {result["slug"]}')
 
     logging.info("")
     logging.info("Writing to XML files")
