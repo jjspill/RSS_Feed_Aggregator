@@ -92,7 +92,10 @@ def validate(data):
         if all(key in d for key in required_fields):
             filtered_data.append(d)
         else:
-            logging.error(f"Record does not have all required fields: {d}")
+            logging.error(
+                f"Record does not have all required fields, record: {d}"
+            )
+            logging.error("Not writing record to YAML file")
 
     return filtered_data
 

@@ -3,6 +3,7 @@ import helpers.feed_helpers.feed_writer as writer
 import helpers.feed_helpers.feed_parser_class as parser
 from multiprocessing import Pool
 import logging
+import time
 import yaml
 import os
 
@@ -20,7 +21,7 @@ def load_yaml_config(filepath=None):
         with open(filepath, "r") as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
-        logging.error(f"Error: File '{filepath}' not found.")
+        logging.error(f"Error File '{filepath}' not found.")
     except PermissionError:
         logging.error(
             f"Error: Permission denied when trying to read '{filepath}'."
@@ -32,7 +33,9 @@ def load_yaml_config(filepath=None):
     exit(1)
 
 
-def process_yaml(caching=False, entries_only=True, filepath=None):
+def process_yaml(
+    caching=False, entries_only=True, filepath=None, yaml_generation_time=None
+):
     """
     Process YAML by fetching, parsing, and writing to XML files.
     """
@@ -43,27 +46,30 @@ def process_yaml(caching=False, entries_only=True, filepath=None):
 
     aggregated_results = []
     multi_results = []
-
+    async_start_time = time.time()
     # (response status, config, url, response data, caching, cache_data)
     async_results = concurrency.async_run(yaml_config, caching)
+    async_end_time = time.time()
 
     logging.info("Parsing all configurations")
-
+    parser_start_time = time.time()
     with Pool() as pool:
         multi_results = pool.map(
             parser.FeedProcessor.process_feed_wrapper, async_results
         )
 
-    logging.info("Finished parsing all configurations")
-    logging.info("")
-
     aggregated_results, total_num_entries = concurrency.reorganize_results(
         multi_results
     )
 
+    logging.info("Finished parsing all configurations")
+    logging.info("")
+    parser_end_time = time.time()
+
     # Write to XML files
     writer_args_list = []
     total_entries_found = 0
+    writer_start_time = time.time()
 
     if not os.path.exists("rss_feeds"):
         os.makedirs("rss_feeds")
@@ -105,6 +111,7 @@ def process_yaml(caching=False, entries_only=True, filepath=None):
         pool.map(writer.output_feed, writer_args_list)
 
     logging.info("Finished writing to XML files")
+    writer_end_time = time.time()
 
     logging.info("")
     logging.info("Finished processing all configurations")
@@ -113,3 +120,15 @@ def process_yaml(caching=False, entries_only=True, filepath=None):
     logging.info("Summary:")
     logging.info(f"Total entries parsed: {total_num_entries}")
     logging.info(f"Total entries found: {total_entries_found}")
+
+    async_duration = async_end_time - async_start_time
+    parser_duration = parser_end_time - parser_start_time
+    writer_duration = writer_end_time - writer_start_time
+
+    if yaml_generation_time:
+        logging.info(
+            f"Duration of YAML gen: {yaml_generation_time: .2f} seconds"
+        )
+    logging.info(f"Duration of fetching: {async_duration: .2f} seconds")
+    logging.info(f"Duration of parsing:  {parser_duration: .2f} seconds")
+    logging.info(f"Duration of writing:  {writer_duration: .2f} seconds")

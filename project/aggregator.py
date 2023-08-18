@@ -30,15 +30,25 @@ def run_(
 
     cacher.setup_database()
 
+    yaml_generation_time = None
     if not filepath:
+        yaml_generation_start_time = time.time()
+
         generator.generate_yaml()
 
+        yaml_generation_end_time = time.time()
+        yaml_generation_time = (
+            yaml_generation_end_time - yaml_generation_start_time
+        )
+
     if parsing:
-        aggregator.process_yaml(caching, entries_only, filepath)
+        aggregator.process_yaml(
+            caching, entries_only, filepath, yaml_generation_time
+        )
 
     endtime = time.time()
     duration = endtime - start_time
-    logging.info(f"Duration of run: {duration: .2f} seconds")
+    logging.info(f"Duration of run:      {duration: .2f} seconds")
 
     logging.info("")
     logging.info("Finished RSS Feed Aggregator")

@@ -76,7 +76,7 @@ async def fetch_url(config, url, caching=False):
                     )
                     return None
                 elif response.status == 404:
-                    logging.error(f"Error: URL {url} not found.")
+                    logging.error(f"Error URL not found. URL: {url} ")
                     return None
                 data = await response.text()
                 return (
@@ -89,7 +89,8 @@ async def fetch_url(config, url, caching=False):
                 )
 
     except aiohttp.ClientError as e:
-        logging.error(f"Error fetching {url}: {str(e)}")
+        logging.error(f"Error fetching slug: {config['slug']}, URL: {url}")
+        logging.error(f"Error {e}")
         return None
 
 
