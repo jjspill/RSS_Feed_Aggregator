@@ -47,7 +47,7 @@ async def fetch_url(config, url, caching=False):
     Fetch URL and return status code and data.
     """
 
-    logging.info(f"Fetching URL: {url}")
+    logging.info(f"Fetching {config['slug']} URL: {url}")
     slug_url = config["slug"] + url
     cache_data = cacher.fetch_cache(slug_url) if caching else None
     last_seen_id, etag_value, last_modified_value = cache_data or (

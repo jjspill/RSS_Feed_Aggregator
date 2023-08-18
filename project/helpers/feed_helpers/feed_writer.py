@@ -2,7 +2,6 @@ from helpers.feed_helpers.feed_writer_class import (
     FeedProcessorET,
     FeedProcessorSTR,
 )
-import os
 
 
 def output_feed(args_list):
@@ -11,13 +10,14 @@ def output_feed(args_list):
     """
 
     slug, entries, feed_data, feed_type, caching, entries_only = args_list
-    if not entries or not feed_data:
-        return None
-
-    if not os.path.exists("rss_feeds"):
-        os.makedirs("rss_feeds")
 
     output_file = f"rss_feeds/{slug}_feed.xml"
+
+    if not entries or not feed_data:
+        if not caching:
+            with open(output_file, "w") as f:
+                pass
+        return None
 
     xml_output = ""
     if entries_only:

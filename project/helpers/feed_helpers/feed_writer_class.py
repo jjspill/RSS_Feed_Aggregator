@@ -99,9 +99,17 @@ class FeedProcessorET(FeedProcessorBase):
 
     # Required
     def process_title(self):
-        ET.SubElement(self.entry_element, "title").text = self.entry.get(
-            "title", "No title"
-        )
+        title = self.entry.get("title", "No title")
+        title_type = self.entry.get("title_detail", {}).get("type", "text")
+
+        if title_type == "text/plain" or title_type == "text":
+            cleaned_title = re.sub("<[^<]+?>", "", title)  # Remove HTML tags
+            cleaned_title = html.unescape(cleaned_title)
+            ET.SubElement(self.entry_element, "title").text = cleaned_title
+        else:
+            ET.SubElement(
+                self.entry_element, "title", type="html"
+            ).text = title
 
     # Optional
     def process_published(self):
@@ -155,7 +163,8 @@ class FeedProcessorET(FeedProcessorBase):
 
     # Optional
     def process_summary(self):
-        if "summary" in self.entry:
+        summary = self.entry.get("summary")
+        if summary:
             # Convert summary type to Atom type
             type_mapping = {
                 "text/plain": "text",
@@ -165,9 +174,14 @@ class FeedProcessorET(FeedProcessorBase):
             summary_type = type_mapping.get(
                 self.entry.get("summary_detail", {}).get("type"), "text"
             )
+
+            if summary_type == "text":
+                summary = re.sub("<[^<]+?>", "", summary)  # Remove HTML tags
+                summary = html.unescape(summary)
+
             ET.SubElement(
                 self.entry_element, "summary", type=summary_type
-            ).text = self.entry["summary"]
+            ).text = summary
 
     # Optional
     def process_enclosures(self):
@@ -213,19 +227,29 @@ class FeedProcessorET(FeedProcessorBase):
         Checks if the atom_id is a valid URI or URN.
         """
 
+        # Basic URI pattern: checks for scheme followed by ://
         uri_pattern = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*://.*$")
-        urn_pattern = re.compile(r"^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:.*$")
+
+        # General URN pattern
+        general_urn_pattern = re.compile(
+            r"^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:.*$"
+        )
+
+        # Specific pattern for Atom's tag URNs
+        tag_urn_pattern = re.compile(r"^tag:[a-zA-Z0-9.-]+,[0-9]{4}:[^ ]+$")
 
         return (
             uri_pattern.match(atom_id) is not None
-            or urn_pattern.match(atom_id) is not None  # noqa: W503
+            or general_urn_pattern.match(atom_id) is not None  # noqa
+            or tag_urn_pattern.match(atom_id) is not None  # noqa
         )
 
     def is_atom_time(self, date_str):
         """
         Checks if the date_str is a valid RFC-3339 date-time string.
         """
-
+        if date_str.endswith("Z"):
+            date_str = date_str[:-1]  # Remove the 'Z'
         try:
             datetime.fromisoformat(date_str)
             return True
@@ -357,7 +381,7 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_updated(self):
         updated = self.entry.get("updated")
         if updated and self.feed_atom:
-            self.xml_strings.append(f" <updated>{updated}</updated>")
+            self.xml_strings.append(f"  <updated>{updated}</updated>")
 
     def process_id(self):
         id_value = self.entry.get("id")
@@ -388,7 +412,7 @@ class FeedProcessorSTR(FeedProcessorBase):
             )
         elif summary:
             self.xml_strings.append(
-                f" <description>{html.escape(summary)}</description>"
+                f"  <description>{html.escape(summary)}</description>"
             )
 
     def process_enclosures(self):

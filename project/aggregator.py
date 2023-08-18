@@ -35,6 +35,7 @@ def run_(
 
     if parsing:
         aggregator.process_yaml(caching, entries_only, filepath)
+
     endtime = time.time()
     duration = endtime - start_time
     logging.info(f"Duration of run: {duration: .2f} seconds")
@@ -59,7 +60,7 @@ def cli_main():
     )
     parser.add_argument(
         "-v",
-        "--valid_css",
+        "--valid_rss",
         action="store_true",
         dest="valid_rss",
         help="Print only the relevant entries without Atom formatting",

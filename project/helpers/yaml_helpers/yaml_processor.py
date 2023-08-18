@@ -4,6 +4,7 @@ import helpers.feed_helpers.feed_parser_class as parser
 from multiprocessing import Pool
 import logging
 import yaml
+import os
 
 
 def load_yaml_config(filepath=None):
@@ -31,7 +32,7 @@ def load_yaml_config(filepath=None):
     exit(1)
 
 
-def process_yaml(caching=False, entries_only=False, filepath=None):
+def process_yaml(caching=False, entries_only=True, filepath=None):
     """
     Process YAML by fetching, parsing, and writing to XML files.
     """
@@ -64,6 +65,9 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
     writer_args_list = []
     total_entries_found = 0
 
+    if not os.path.exists("rss_feeds"):
+        os.makedirs("rss_feeds")
+
     for result in aggregated_results:
         if result["aggregated_entries"]:
             logging.info(
@@ -84,6 +88,15 @@ def process_yaml(caching=False, entries_only=False, filepath=None):
 
         else:
             logging.info(f'Found: 0   entries for {result["slug"]}')
+
+            result_List = [
+                result["slug"],
+                None,
+                None,
+                None,
+                caching,
+                entries_only,
+            ]
 
     logging.info("")
     logging.info("Writing to XML files")
