@@ -119,7 +119,7 @@ def process_yaml(
 
     logging.info("Summary:")
     logging.info(f"Total entries parsed: {total_num_entries}")
-    logging.info(f"Total entries found: {total_entries_found}")
+    logging.info(f"Total entries found:  {total_entries_found}")
 
     async_duration = async_end_time - async_start_time
     parser_duration = parser_end_time - parser_start_time

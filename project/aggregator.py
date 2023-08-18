@@ -4,6 +4,7 @@ import helpers.cache_helpers.cacher as cacher
 import argparse
 import logging
 import time
+import os
 
 
 def run_(
@@ -17,8 +18,16 @@ def run_(
     """
     start_time = time.time()
 
+    current_time = time.strftime("%Y-%m-%d_%H-%M-%S")
+    log_filename = f"log_{current_time}.log"
+    log_folder = "logs"
+    log_path = os.path.join(log_folder, log_filename)
+
+    if not os.path.exists(log_folder):
+        os.makedirs(log_folder)
+
     logging.basicConfig(
-        filename="main_log.log",
+        filename=log_path,
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
         filemode="w",
