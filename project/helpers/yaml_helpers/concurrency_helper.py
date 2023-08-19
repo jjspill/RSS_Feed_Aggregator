@@ -47,7 +47,6 @@ async def fetch_url(config, url, caching=False):
     Fetch URL and return status code and data.
     """
 
-    logging.info(f"Fetching {config['slug']} URL: {url}")
     slug_url = config["slug"] + url
     cache_data = cacher.fetch_cache(slug_url) if caching else None
     last_seen_id, etag_value, last_modified_value = cache_data or (
@@ -56,27 +55,29 @@ async def fetch_url(config, url, caching=False):
         None,
     )
 
-    if cache_data and caching:
-        logging.info("Cached entry found")
-    elif not cache_data and caching:
-        logging.info("No cached entry found")
-
     headers = {}
     if etag_value:
-        headers["If-None-Match"] = etag_value
+        headers["ETAG"] = etag_value
     if last_modified_value:
         headers["If-Modified-Since"] = last_modified_value
 
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
-                if response.status == 304:
-                    logging.info(
-                        "Feed has not been modified since the last request"
+                if caching:
+                    etag_value = response.headers.get("Etag")
+                    last_modified_value = response.headers.get("Last-Modified")
+                    cacher.update_cache_etag_last(
+                        slug_url, etag_value, last_modified_value
                     )
-                    return None
+
+                if response.status == 304:
+                    return "304"
                 elif response.status == 404:
-                    logging.error(f"Error URL not found. URL: {url} ")
+                    logging.error(
+                        f"Error Fetching slug: {config['slug']}, URL: {url}"
+                    )
+                    logging.error("Error Resource not found. Received 404.")
                     return None
                 data = await response.text()
                 return (
@@ -89,7 +90,7 @@ async def fetch_url(config, url, caching=False):
                 )
 
     except aiohttp.ClientError as e:
-        logging.error(f"Error fetching slug: {config['slug']}, URL: {url}")
+        logging.error(f"Error Fetching slug: {config['slug']}, URL: {url}")
         logging.error(f"Error {e}")
         return None
 
@@ -105,13 +106,25 @@ async def fetch_all_urls(yaml_config, caching=False):
         for url in config["urls"]
     ]
 
+    logging.info("")
     logging.info("Fetching all URLs")
-    logging.info("")
     results = await asyncio.gather(*tasks)
-    logging.info("")
     logging.info("Finished fetching all URLs")
     logging.info("")
-    return [result for result in results if result is not None]
+
+    total_num_urls = len(tasks)
+    num_urls_fetched = len(
+        [
+            result
+            for result in results
+            if result is not None and result != "304"
+        ]
+    )
+    num_urls_cached = len([result for result in results if result == "304"])
+
+    return (total_num_urls, num_urls_fetched, num_urls_cached), [
+        result for result in results if result is not None and result != "304"
+    ]
 
 
 def async_run(yaml_config, caching=False):

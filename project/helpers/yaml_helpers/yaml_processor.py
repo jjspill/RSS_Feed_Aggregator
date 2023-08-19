@@ -48,7 +48,7 @@ def process_yaml(
     multi_results = []
     async_start_time = time.time()
     # (response status, config, url, response data, caching, cache_data)
-    async_results = concurrency.async_run(yaml_config, caching)
+    url_data, async_results = concurrency.async_run(yaml_config, caching)
     async_end_time = time.time()
 
     logging.info("Parsing all configurations")
@@ -118,8 +118,19 @@ def process_yaml(
     logging.info("")
 
     logging.info("Summary:")
+    logging.info("URL Fetching data:")
+    logging.info(f"Number URLs: {url_data[0]}")
+    logging.info(f"Success:     {(url_data[1])}")
+    logging.info(
+        f"Failed:      {(url_data[0]) - (url_data[1]) - (url_data[2])}"
+    )
+    logging.info(f"Cached:      {(url_data[2])}")
+    logging.info("")
+    logging.info("Feed Parsing data:")
     logging.info(f"Total entries parsed: {total_num_entries}")
     logging.info(f"Total entries found:  {total_entries_found}")
+    logging.info("")
+    logging.info("Time Profile:")
 
     async_duration = async_end_time - async_start_time
     parser_duration = parser_end_time - parser_start_time

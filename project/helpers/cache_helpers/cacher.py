@@ -33,7 +33,7 @@ def setup_database():
         logging.info("Database exists")
 
 
-def update_cache(slug_url, last_seen_id, etag=None, last_modified=None):
+def update_cache_etag_last(slug_url, etag=None, last_modified=None):
     # Connect to database
     with sqlite3.connect(DATABASE_FILEPATH) as conn:
         cursor = conn.cursor()
@@ -41,10 +41,43 @@ def update_cache(slug_url, last_seen_id, etag=None, last_modified=None):
         # Insert or update cache entry
         cursor.execute(
             """
-            INSERT OR REPLACE INTO cache (slug_url, last_seen_id, etag, last_modified)
-            VALUES (?, ?, ?, ?)
+            INSERT OR IGNORE INTO cache (slug_url)
+            VALUES (?)
             """,
-            (slug_url, last_seen_id, etag, last_modified),
+            (slug_url,),
+        )
+
+        cursor.execute(
+            """
+            UPDATE cache
+            SET etag=?, last_modified=?
+            WHERE slug_url=?
+            """,
+            (etag, last_modified, slug_url),
+        )
+
+
+def update_cache_id(slug_url, last_seen_id=None):
+    # Connect to database
+    with sqlite3.connect(DATABASE_FILEPATH) as conn:
+        cursor = conn.cursor()
+
+        # Insert or update cache entry
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO cache (slug_url)
+            VALUES (?)
+            """,
+            (slug_url,),
+        )
+
+        cursor.execute(
+            """
+            UPDATE cache
+            SET last_seen_id=?
+            WHERE slug_url=?
+            """,
+            (last_seen_id, slug_url),
         )
 
 

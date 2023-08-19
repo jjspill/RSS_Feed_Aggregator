@@ -369,14 +369,14 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_title(self):
         title = self.entry.get("title")
         if title:
-            self.xml_strings.append(f" <title>{html.escape(title)}</title>")
+            self.xml_strings.append(f"  <title>{html.escape(title)}</title>")
 
     def process_published(self):
         published = self.entry.get("published")
         if published and self.feed_atom:
-            self.xml_strings.append(f" <published>{published}</published>")
+            self.xml_strings.append(f"  <published>{published}</published>")
         elif published:
-            self.xml_strings.append(f" <pubDate>{published}</pubDate>")
+            self.xml_strings.append(f"  <pubDate>{published}</pubDate>")
 
     def process_updated(self):
         updated = self.entry.get("updated")
@@ -386,7 +386,7 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_id(self):
         id_value = self.entry.get("id")
         if id_value and self.feed_atom:
-            self.xml_strings.append(f" <id>{id_value}</id>")
+            self.xml_strings.append(f"  <id>{id_value}</id>")
         elif id_value:
             guidislink = self.entry.get("guidislink", False)
             self.xml_strings.append(
@@ -470,7 +470,9 @@ class FeedProcessorSTR(FeedProcessorBase):
     def process_author(self):
         author = self.entry.get("author")
         if author:
-            self.xml_strings.append(f" <author><name>{author}</name></author>")
+            self.xml_strings.append(
+                f"  <author><name>{author}</name></author>"
+            )
 
     def get_xml(self):
         return "\n".join(self.xml_strings) + "\n\n"

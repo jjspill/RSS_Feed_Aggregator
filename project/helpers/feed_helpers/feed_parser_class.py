@@ -20,7 +20,6 @@ class FeedProcessor:
         """
         Wrapper for process_feed to allow for multiprocessing.
         """
-
         processor = FeedProcessor(args)
         return processor.process_feed()
 
@@ -132,12 +131,7 @@ class FeedProcessor:
                     new_last_seen_id = (
                         feed.entries[0]["link"] if feed.entries else None
                     )
-
-                new_etag = getattr(feed, "etag", None)
-                new_last_modified = getattr(feed, "modified", None)
-                cacher.update_cache(
-                    slug_url, new_last_seen_id, new_etag, new_last_modified
-                )
+                cacher.update_cache_id(slug_url, new_last_seen_id)
 
             result_dict = {
                 "filtered_entries": config_filtered_entries,
