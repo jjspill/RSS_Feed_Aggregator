@@ -1,23 +1,14 @@
 import helpers.yaml_helpers.yaml_writer as generator
 import helpers.yaml_helpers.yaml_processor as aggregator
 import helpers.cache_helpers.cacher as cacher
+import helpers.scheduler_helpers.scheduler as scheduler
 import argparse
 import logging
 import time
 import os
 
 
-def run_(
-    caching=False,
-    entries_only=True,
-    parsing=True,
-    filepath=None,
-):
-    """
-    Run the RSS Feed Aggregator.
-    """
-    start_time = time.time()
-
+def config_logging():
     current_time = time.strftime("%Y-%m-%d_%H-%M-%S")
     log_filename = f"log_{current_time}.log"
     log_folder = "logs"
@@ -32,6 +23,63 @@ def run_(
         format="%(asctime)s - %(levelname)s - %(message)s",
         filemode="w",
     )
+
+
+def scheduler_run(
+    total_time,
+    interval_time,
+    caching=True,
+    entries_only=True,
+    parsing=True,
+    filepath=None,
+):
+    """
+    Run the RSS Feed Aggregator at a set interval.
+    """
+    config_logging()
+
+    logging.info(f"Starting Scheduler at {time.strftime('%Y-%m-%d_%H-%M-%S')}")
+    database_path = "helpers/cache_helpers/cache.db"
+
+    # Clear database
+    if caching and os.path.exists(database_path):
+        os.remove(database_path)
+
+    wait_schedule = scheduler.scheduler(total_time, interval_time)
+
+    if not filepath:
+        generator.generate_yaml()
+        logging.info("")
+        filepath = "yaml_config/rss_config.yaml"
+
+    running = True
+    while running:
+        try:
+            print("HERE")
+            run_(caching, entries_only, parsing, filepath)
+            logging.info("")
+            logging.info("")
+            logging.info(f"Sleeping for {interval_time} seconds")
+            logging.info("")
+            logging.info("")
+            running = next(wait_schedule)
+
+        except StopIteration:
+            running = False
+
+    logging.info(f"Ending Scheduler at {time.strftime('%Y-%m-%d_%H-%M-%S')}")
+
+
+def run_(
+    caching=False,
+    entries_only=True,
+    parsing=True,
+    filepath=None,
+):
+    """
+    Run the RSS Feed Aggregator.
+    """
+    start_time = time.time()
 
     logging.info("")
     logging.info("Starting RSS Feed Aggregator")
@@ -71,16 +119,18 @@ def cli_main():
 
     parser = argparse.ArgumentParser(description="RSS Feed Aggregator")
     parser.add_argument(
-        "-c",
-        "--cache",
-        action="store_true",
+        "-nc",
+        "--no_cache",
+        default=True,
+        action="store_false",
         dest="cache",
         help="Enable caching to avoid processing old data",
     )
     parser.add_argument(
         "-v",
         "--valid_rss",
-        action="store_true",
+        default=True,
+        action="store_false",
         dest="valid_rss",
         help="Print only the relevant entries without Atom formatting",
     )
@@ -88,7 +138,7 @@ def cli_main():
         "-y",
         "--yaml",
         type=str,
-        default=None,
+        default=False,
         action="store",
         dest="yaml",
         help="Specify the yaml configuration",
@@ -96,17 +146,56 @@ def cli_main():
     parser.add_argument(
         "-np",
         "--no_parsing",
-        action="store_true",
+        default=True,
+        action="store_false",
         dest="no_parsing",
         help="Disable parsing and only write the yaml file",
+    )
+    parser.add_argument(
+        "-s",
+        "--scheduler",
+        nargs=2,
+        type=int,
+        dest="scheduler",
+        default=False,
+        help="Schedule aggregator to run at a set interval. -s <total_time> <interval_time>",
     )
 
     args = parser.parse_args()
 
+    if args.yaml and not os.path.exists(args.yaml):
+        print(f"Error: The provided yaml file '{args.yaml}' does not exist.")
+        return
+
+    # Default is to cache
     caching = args.cache
-    entries_only = not args.valid_rss
+
+    # Default is to print only the relevant entries
+    entries_only = args.valid_rss
+
+    # Default is default yaml filepath
     filepath = args.yaml
-    parsing = not args.no_parsing
+
+    # Default is to parse
+    parsing = args.no_parsing
+
+    # Default is to not schedule
+    scheduling = args.scheduler
+
+    if scheduling:
+        total_time = scheduling[0]
+        interval_time = scheduling[1]
+        scheduler_run(
+            total_time,
+            interval_time,
+            caching,
+            entries_only,
+            parsing,
+            filepath,
+        )
+        return
+
+    config_logging()
 
     run_(caching, entries_only, parsing, filepath)
 

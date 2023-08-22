@@ -53,22 +53,24 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```bash
     python3 aggregator.py
     ```
-    Default mode means that the Aggregator will output entries only and will use concurrency to fetch, parse, and write to files.
+    Default mode means that the Aggregator will output entries only, use caching, and use concurrency to fetch, parse, and write to files.
 
 4. **The results will be saved in the `RSS_Feed_Aggregator/project/rss-feeds` directory as XML files, categorized by their respective slugs**  
 
 5. **Logs are written to `RSS_Feed_Aggregator/main_log.log`**
 
 6. **Flags**
-- Use `--cache` or `-c` to enable caching of aggregated entries for each configuration.
-- Use `--valid_rss` or `-v` to output a valid atom feed for each configuration.
+- Use `--no_cache` or `-nc` to disable caching of aggregated entries for each configuration.
+- Use `--valid_rss` or `-v` to output a valid atom feed for each configuration instead of only relevant entries.
 - Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML.
 - Use `--yaml <filepath>` or `-y <filepath>` to disable YAML creation and use an already created configuration YAML.
+- Use `--scheduler <total_time> <interval_time>` or `-s <total_time> <interval_time>` to run the Aggregator at regular intervals for a specifc amount of time (this only works on MacOS).
 
 ## Notes
 - valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.
 - The Aggregator can handle both RSS and Atom feeds as inputs, but it will always output a valid Atom feed if valid_rss is enabled.
 - The Aggregator and cache will work with any flags just keep in mind changing the cache or valid_rss flags in between consecutive runs will cause problems with how the cached feeds / entries are merged with the new ones. If this problem occurs, delete the cache.db file in the cache_helpers directory.
+- When using the scheduler, if a YAML is not provided, the Airtable is parsed once before the first run and all other runs use the same `rss_config.yaml` file.
 
 ## File Explanations
 - aggregator.py: Serves as the main entry point, managing the command-line interface and overall orchestration.
@@ -79,3 +81,4 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 - feed_writer_class.py: Dictates the format and structure of each entry, item, (or feed if --valid_rss is activated).
 - feed_writer.py: Finalizes and writes processed data to designated output files.
 - cacher.py: Administers the caching mechanisms.
+- scheduler.py: Uses caffeinate to keep MacOS awake and dictates the total / interval timing.
