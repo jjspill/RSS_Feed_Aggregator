@@ -57,7 +57,7 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 
 4. **The results will be saved in the `RSS_Feed_Aggregator/project/rss-feeds` directory as XML files, categorized by their respective slugs**  
 
-5. **Logs are written to `RSS_Feed_Aggregator/main_log.log`**
+5. **Logs are written to `RSS_Feed_Aggregator/project/logs` directory**
 
 6. **Flags**
 - Use `--no_cache` or `-nc` to disable caching of aggregated entries for each configuration.
