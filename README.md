@@ -17,8 +17,11 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 3. **Set Up and Start a Virtual Environment:** (Highly Recommended)
     ```bash
     python3 -m venv env
+    ```
+    ```bash
     source env/bin/activate
     ```
+    
 
 4. **Install Dependencies:**
     ```bash
@@ -67,6 +70,8 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 - Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML
 - Use `--yaml <filepath>` or `-y <filepath>` to disable YAML creation and use an already created configuration YAML
 - Use `--scheduler <total_time> <interval_time>` or `-s <total_time> <interval_time>` to run the Aggregator at regular intervals for a specific amount of time (this only works on MacOS)
+    - Time is in seconds
+    - Example: `python3 aggregator.py -s 300 30` fetches and parses every 30 seconds for 300 seconds
 
 ## Airtable Setup
 - A valid input Airtable table consists of five columns: name, slug, urls, match, exclude
