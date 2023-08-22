@@ -121,6 +121,8 @@ def generate_yaml():
         logging.info("No data found in Airtable or an error occurred, exiting")
         exit(1)
 
+    logging.info("Data found in Airtable")
+
     processed_data = [
         processed
         for data in table_data
@@ -130,8 +132,6 @@ def generate_yaml():
     # Validate data
     processed_data = validate(processed_data)
 
-    logging.info("Data found in Airtable, writing to YAML file")
-    logging.info("")
     # Save data as YAML file
 
     if not os.path.exists("yaml_config"):
@@ -147,3 +147,6 @@ def generate_yaml():
                 Dumper=MyDumper,
             )
         )
+
+    logging.info("YAML config file saved")
+    logging.info("")

@@ -60,7 +60,7 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 5. **Logs are written to `RSS_Feed_Aggregator/project/logs` directory**
 
 6. **Flags**
-- Use `--no_cache` or `-nc` to disable caching of aggregated entries for each configuration.
+- Use `--caching` or `-c` to enable caching of aggregated entries for each configuration (when scheduling, caching is always used).
 - Use `--valid_rss` or `-v` to output a valid atom feed for each configuration instead of only relevant entries.
 - Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML.
 - Use `--yaml <filepath>` or `-y <filepath>` to disable YAML creation and use an already created configuration YAML.

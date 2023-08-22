@@ -37,6 +37,9 @@ def scheduler_run(
     Run the RSS Feed Aggregator at a set interval.
     """
     config_logging()
+
+    # Scheduler always using caching
+    caching = True
     start_time_formatted = time.strftime("%Y-%m-%d_%H-%M-%S")
 
     logging.info(f"Starting Scheduler at {start_time_formatted}")
@@ -139,10 +142,10 @@ def cli_main():
 
     parser = argparse.ArgumentParser(description="RSS Feed Aggregator")
     parser.add_argument(
-        "-nc",
-        "--no_cache",
-        default=True,
-        action="store_false",
+        "-c",
+        "--caching",
+        default=False,
+        action="store_true",
         dest="cache",
         help="Enable caching to avoid processing old data",
     )
@@ -187,7 +190,7 @@ def cli_main():
         print(f"Error: The provided yaml file '{args.yaml}' does not exist.")
         return
 
-    # Default is to cache
+    # Default is not to cache
     caching = args.cache
 
     # Default is to print only the relevant entries
