@@ -37,26 +37,32 @@ def scheduler_run(
     Run the RSS Feed Aggregator at a set interval.
     """
     config_logging()
+    start_time_formatted = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-    logging.info(f"Starting Scheduler at {time.strftime('%Y-%m-%d_%H-%M-%S')}")
+    logging.info(f"Starting Scheduler at {start_time_formatted}")
     database_path = "helpers/cache_helpers/cache.db"
 
     # Clear database
     if caching and os.path.exists(database_path):
         os.remove(database_path)
 
+    output_folder = f"schedule_{start_time_formatted}"
+    output_folder_path = os.path.join("rss_feeds", output_folder)
+
+    if not os.path.exists(output_folder_path):
+        os.makedirs(output_folder_path)
+
     wait_schedule = scheduler.scheduler(total_time, interval_time)
 
     if not filepath:
-        generator.generate_yaml()
         logging.info("")
+        generator.generate_yaml()
         filepath = "yaml_config/rss_config.yaml"
 
     running = True
     while running:
         try:
-            print("HERE")
-            run_(caching, entries_only, parsing, filepath)
+            run_(caching, entries_only, parsing, filepath, output_folder)
             logging.info("")
             logging.info("")
             logging.info(f"Sleeping for {interval_time} seconds")
@@ -75,14 +81,24 @@ def run_(
     entries_only=True,
     parsing=True,
     filepath=None,
+    output_folder=None,
 ):
     """
     Run the RSS Feed Aggregator.
     """
     start_time = time.time()
+    start_time_formatted = time.strftime("%Y-%m-%d_%H-%M-%S")
+
+    output_folder_path = output_folder
+    if not output_folder:
+        output_folder = f"run_{start_time_formatted}"
+        output_folder_path = os.path.join("rss_feeds", output_folder)
+
+        if not os.path.exists(output_folder_path):
+            os.makedirs(output_folder_path)
 
     logging.info("")
-    logging.info("Starting RSS Feed Aggregator")
+    logging.info(f"Starting RSS Feed Aggregator at {start_time_formatted}")
     logging.info("")
 
     cacher.setup_database()
@@ -100,7 +116,11 @@ def run_(
 
     if parsing:
         aggregator.process_yaml(
-            caching, entries_only, filepath, yaml_generation_time
+            caching,
+            entries_only,
+            filepath,
+            yaml_generation_time,
+            output_folder,
         )
 
     endtime = time.time()

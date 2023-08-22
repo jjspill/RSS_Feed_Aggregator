@@ -9,10 +9,12 @@ def output_feed(args_list):
     Output XML feeds to respective files.
     """
 
-    slug, entries, feed_data, feed_type, caching, entries_only = args_list
+    slug, entries, feed_data, feed_type, caching, entries_only = args_list[0]
+    output_folder = args_list[1]
 
-    output_file = f"rss_feeds/{slug}_feed.xml"
+    output_file = f"rss_feeds/{output_folder}/{slug}_feed.xml"
 
+    # If no entries or feed_data, then don't write to filex
     if not entries or not feed_data:
         if not caching:
             with open(output_file, "w") as f:

@@ -34,7 +34,11 @@ def load_yaml_config(filepath=None):
 
 
 def process_yaml(
-    caching=False, entries_only=True, filepath=None, yaml_generation_time=None
+    caching=False,
+    entries_only=True,
+    filepath=None,
+    yaml_generation_time=None,
+    output_folder=None,
 ):
     """
     Process YAML by fetching, parsing, and writing to XML files.
@@ -107,8 +111,10 @@ def process_yaml(
     logging.info("")
     logging.info("Writing to XML files")
 
+    writer_args_folder = [(args, output_folder) for args in writer_args_list]
+
     with Pool() as pool:
-        pool.map(writer.output_feed, writer_args_list)
+        pool.map(writer.output_feed, writer_args_folder)
 
     logging.info("Finished writing to XML files")
     writer_end_time = time.time()

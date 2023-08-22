@@ -38,7 +38,7 @@ def update_cache_etag_last(slug_url, etag=None, last_modified=None):
     with sqlite3.connect(DATABASE_FILEPATH) as conn:
         cursor = conn.cursor()
 
-        # Insert or update cache entry
+        # Insert or update etag / last_ modified cache entry
         cursor.execute(
             """
             INSERT OR IGNORE INTO cache (slug_url)
@@ -62,7 +62,7 @@ def update_cache_id(slug_url, last_seen_id=None):
     with sqlite3.connect(DATABASE_FILEPATH) as conn:
         cursor = conn.cursor()
 
-        # Insert or update cache entry
+        # Insert or update id cache entry
         cursor.execute(
             """
             INSERT OR IGNORE INTO cache (slug_url)
