@@ -64,7 +64,15 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
 - Use `--valid_rss` or `-v` to output a valid atom feed for each configuration instead of only relevant entries.
 - Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML.
 - Use `--yaml <filepath>` or `-y <filepath>` to disable YAML creation and use an already created configuration YAML.
-- Use `--scheduler <total_time> <interval_time>` or `-s <total_time> <interval_time>` to run the Aggregator at regular intervals for a specifc amount of time (this only works on MacOS).
+- Use `--scheduler <total_time> <interval_time>` or `-s <total_time> <interval_time>` to run the Aggregator at regular intervals for a specific amount of time (this only works on MacOS).
+
+## Airtable Setup
+- A valid input Airtable table consists of five columns: name, slug, urls, match, exclude.
+    - name: a name for the record
+    - slug: a URL-friendly version of the name
+    - urls: a list of URLs to parse
+    - match: a list of keywords to match (at least keyword one must match for the entry to be valid)
+    - exclude: a list of keywords to exclude (one matching exclude keyword invalidates the entry)
 
 ## Notes
 - valid_rss (-v) Clarification: This means that header data (namespace, encoding, ...) will be at the top of the `.xml` file and the output will be a valid Atom feed.
