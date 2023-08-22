@@ -72,7 +72,15 @@ async def fetch_url(config, url, caching=False):
                     )
 
                 if response.status == 304:
-                    return "304"
+                    data = None
+                    return (
+                        response.status,
+                        config,
+                        url,
+                        data,
+                        caching,
+                        cache_data,
+                    )
                 elif response.status == 404:
                     logging.error(
                         f"Error Fetching slug: {config['slug']}, URL: {url}"
@@ -99,12 +107,17 @@ async def fetch_all_urls(yaml_config, caching=False):
     """
     Fetch all URLs with async.
     """
+    slug_counts = {}
+    tasks = []
 
-    tasks = [
-        fetch_url(config, url, caching)
-        for config in yaml_config
-        for url in config["urls"]
-    ]
+    for config in yaml_config:
+        slug = config["slug"]
+        if slug not in slug_counts:
+            slug_counts[slug] = {"total": 0, "304s": 0}
+
+        for url in config["urls"]:
+            slug_counts[slug]["total"] += 1
+            tasks.append(fetch_url(config, url, caching))
 
     logging.info("")
     logging.info("Fetching all URLs")
@@ -113,18 +126,32 @@ async def fetch_all_urls(yaml_config, caching=False):
     logging.info("")
 
     total_num_urls = len(tasks)
-    num_urls_fetched = len(
-        [
-            result
-            for result in results
-            if result is not None and result != "304"
-        ]
-    )
-    num_urls_cached = len([result for result in results if result == "304"])
+    filtered_results = []
+    num_urls_fetched = 0
+    num_urls_cached = 0
 
-    return (total_num_urls, num_urls_fetched, num_urls_cached), [
-        result for result in results if result is not None and result != "304"
+    for result in results:
+        if result is not None:
+            slug = result[1]["slug"]
+
+            if result[0] == 304:
+                slug_counts[slug]["304s"] += 1
+                num_urls_cached += 1
+            else:
+                filtered_results.append(result)
+                num_urls_fetched += 1
+
+    all_304_slugs = [
+        slug
+        for slug, counts in slug_counts.items()
+        if counts["total"] == counts["304s"]
     ]
+
+    return (
+        (total_num_urls, num_urls_fetched, num_urls_cached),
+        filtered_results,
+        all_304_slugs,
+    )
 
 
 def async_run(yaml_config, caching=False):

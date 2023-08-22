@@ -52,7 +52,9 @@ def process_yaml(
     multi_results = []
     async_start_time = time.time()
     # (response status, config, url, response data, caching, cache_data)
-    url_data, async_results = concurrency.async_run(yaml_config, caching)
+    url_data, async_results, all_304_slugs = concurrency.async_run(
+        yaml_config, caching
+    )
     async_end_time = time.time()
 
     logging.info("Parsing all configurations")
@@ -107,6 +109,9 @@ def process_yaml(
                 caching,
                 entries_only,
             ]
+
+    for slug in all_304_slugs:
+        logging.info(f"Found: 0   entries for {slug}")
 
     logging.info("")
     logging.info("Writing to XML files")
