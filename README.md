@@ -55,11 +55,13 @@ The RSS Feed Aggregator is a Python tool that fetches, aggregates, and filters R
     ```
     Default mode means that the Aggregator will output entries only, use caching, and use concurrency to fetch, parse, and write to files.
 
-4. **The results will be saved in the `RSS_Feed_Aggregator/project/rss-feeds` directory as XML files, categorized by their respective slugs**  
+4. **Generated YAMLS will be saved to the `RSS_Feed_Aggregator/project/yaml_config` directory**
 
-5. **Logs are written to `RSS_Feed_Aggregator/project/logs` directory**
+5. **The results will be saved in the `RSS_Feed_Aggregator/project/rss_feeds` directory as XML files, categorized by their respective slugs**  
 
-6. **Flags**
+6. **Logs are saved to `RSS_Feed_Aggregator/project/logs` directory**
+
+7. **Flags**
 - Use `--caching` or `-c` to enable caching of aggregated entries for each configuration (when scheduling, caching is always used).
 - Use `--valid_rss` or `-v` to output a valid atom feed for each configuration instead of only relevant entries.
 - Use `--no_parsing` or `-np` to disable parsing and only create a configuration YAML.
