@@ -9,4 +9,5 @@
 *.DS_Store
 *.yaml
 *cache.db
+*__pycache__
 project/testing/*
